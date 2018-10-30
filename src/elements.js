@@ -1,20 +1,28 @@
-class Header {
-	constructor () {
-		this.blockElement = true;
-		this.him =
-	}
+function strToRegex (regex) {
+	// Replace conflicting characters
+	regex = regex.replace(/\//g, '&#x2f;');
+	regex = regex.replace(/</g, '&#x3c;');
+	regex = regex.replace(/>/g, '&#x3e;');
 
-	static regex () {
-		let regex = "^# .+$";
+	// Convert to regex
+	regex = new RegExp(regex, "gm");
 
-		// Replace conflicting characters
-		regex = regex.replace(/\//g, '&#x2f;');
-		regex = regex.replace(/</g, '&#x3c;');
-		regex = regex.replace(/>/g, '&#x3e;');
+	return regex;
+}
 
-		// Convert to regex
-		regex = new RegExp(lang[key].regex, "gm");
+function moveCursorLeft (reference) {
+	let text = reference.innerHTML;
+	var match = /<span class="cursor"><\/span>/.exec(text);
+	text = text.replace ('<span class="cursor"></span>', '');
+	text = text.slice(0, match.index - 1) + '<span class="cursor"></span>' + text.slice(match.index - 1);
+	reference.innerHTML = text;
+}
 
-		return regex;
-	}
+Paragraph = {
+	class: "paragraph",
+	regex: strToRegex ('(\n+)?.+\n*'),
+
+	replace: function (match) {
+		return `<span class="paragraph">${match}</span>`;
+	},
 }
