@@ -38,11 +38,28 @@ class CrimsonEditor {
 
 	// Convert a text to crimson elements
 	_parseText (text) {
-		// Separete paragraphs
-		text = text.replace(paragraph.regex, function (match) {
-			return paragraph.replace (match);
+		// Parse block elements
+		text = text.replace(header1.regex, function (match) {
+			return header1.replace (match);
 		});
 
+		// Parse paragraphs
+		text = text.split ('\n');
+		for (let i = 0; i < text.length; i++) {
+			if (text[i][0] !== '<') {
+				if (text[i] !== '') {
+					text[i] = text[i].replace(paragraph.regex, function (match) {
+						return paragraph.replace (match);
+					});
+				} else {
+					text[i] = `<span class=${paragraph.class}></span>`;
+				}
+			}
+		}
+
+		console.log (text);
+		text = text.join ('');
+		
 		return text;
 	}
 

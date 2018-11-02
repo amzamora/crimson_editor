@@ -18,9 +18,7 @@ class Element {
 			if (HTMLelement.previousSibling) {
 				HTMLelement.innerHTML = text.replace ('<span class="cursor"></span>', '');
 				HTMLelement = HTMLelement.previousSibling;
-				text = HTMLelement.innerHTML;
-				text = text.substring(0, text.length-1) + '<span class="cursor"></span>' + '\n';
-				HTMLelement.innerHTML = text;
+				HTMLelement.innerHTML += '<span class="cursor"></span>';
 			}
 		}
 	}
@@ -28,27 +26,22 @@ class Element {
 	moveCursorRight (HTMLelement) {
 		let text = HTMLelement.innerHTML;
 		let match = /<span class="cursor"><\/span>/.exec(text);
-		if (match.index !== text.length - 29 && HTMLelement.nextSibling) {
-			text = text.replace ('<span class="cursor"></span>', '');
+		text = text.replace ('<span class="cursor"></span>', '');
+		if (text.length !== match.index) {
 			text = text.slice(0, match.index + 1) + '<span class="cursor"></span>' + text.slice(match.index + 1);
 			HTMLelement.innerHTML = text;
 
 		} else {
 			if (HTMLelement.nextSibling) {
-				HTMLelement.innerHTML = text.replace ('<span class="cursor"></span>', '');
+				HTMLelement.innerHTML = text;
 				HTMLelement = HTMLelement.nextSibling;
 				HTMLelement.innerHTML = '<span class="cursor"></span>' + HTMLelement.innerHTML;
-
-			} else {
-				text = text.replace ('<span class="cursor"></span>', '');
-				text = text.slice(0, match.index + 1) + '<span class="cursor"></span>' + text.slice(match.index + 1);
-				HTMLelement.innerHTML = text;
 			}
 		}
 	}
 
 	replace (match) {
-		return `<span class="paragraph">${match}</span>`;
+		return `<span class="${this.class}">${match}</span>`;
 	}
 
 	static _strToRegex (regex) {
@@ -65,6 +58,8 @@ class Element {
 }
 
 paragraph = new Element ('paragraph', '(\n+)?.+\n*');
+header1 = new Element ('h1', '^# .+$');
 
 writedown_elements = [];
 writedown_elements.push (paragraph);
+writedown_elements.push (header1);
