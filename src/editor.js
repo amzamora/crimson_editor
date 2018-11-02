@@ -33,22 +33,37 @@ class CrimsonEditor {
 	}
 
 
-	/* Utlities
+	/* Utilities
 	   ======== */
 
 	// Convert a text to crimson elements
 	_parseText (text) {
 		// Separete paragraphs
-		text = text.replace(Paragraph.regex, function (match) {
-			return Paragraph.replace (match);
+		text = text.replace(paragraph.regex, function (match) {
+			return paragraph.replace (match);
 		});
 
 		return text;
 	}
 
 	_putCursorOnText () {
-		let last_element = this.him.childNodes[this.him.childNodes.length - 2];
-		last_element.innerHTML += '<span class="cursor"></span>'
+		let last_element = this.him.childNodes[this.him.childNodes.length - 1];
+		last_element.innerHTML += '<span class="cursor"></span>';
+	}
+
+	_getElementsWithCursor () {
+		let cursors = document.getElementsByClassName('cursor');
+		let elements = []
+
+		for (let cursor of cursors) {
+				parent = cursor.parentNode;
+				while (!parent.parentNode.classList.contains ("CrimsonEditor")) {
+					parent = parentElement
+				}
+				elements.push (parent);
+		}
+
+		return elements;
 	}
 
 
@@ -56,7 +71,28 @@ class CrimsonEditor {
 	   ========= */
 
 	_onInput (e) {
-		console.log (e);
+		if (e.value.length > 1) { // If a special key is pressed
+			// Get element with cursor
+			let HTMLelement = this._getElementsWithCursor()[0];
+
+			// Find what type of element is
+			let writedown_element = undefined;
+			for (let element of writedown_elements) {
+				if (HTMLelement.classList.contains (element.class)) {
+					writedown_element = element;
+				}
+			}
+
+			switch (e.value) {
+				case "left-key":
+					writedown_element.moveCursorLeft (HTMLelement);
+					break;
+
+				case "right-key":
+					writedown_element.moveCursorRight (HTMLelement);
+					break;
+			}
+		}
 	}
 
 	_onClick (e) {
