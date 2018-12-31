@@ -57,9 +57,14 @@ class Element {
 	}
 }
 
-paragraph = new Element ('paragraph', '(\n+)?.+\n*');
-header1 = new Element ('h1', '^# .+$');
-
 writedown_elements = [];
+
+/* Paragraph
+   ========= */
+paragraph = new Element ('paragraph', '');
 writedown_elements.push (paragraph);
+
+/* Headers
+   ======= */
+header1 = new Element ('h1', '^# .+$');
 writedown_elements.push (header1);

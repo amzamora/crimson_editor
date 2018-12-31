@@ -20,7 +20,6 @@ class CrimsonEditor {
 	setText (text) {
 		this.him.innerHTML = this._parseText (text);
 
-		// Put cursor at the end
 		this._putCursorOnText ();
 	}
 
@@ -38,28 +37,22 @@ class CrimsonEditor {
 
 	// Convert a text to crimson elements
 	_parseText (text) {
-		// Parse block elements
+		// Parse block elements (There is no overlap between block elements)
 		text = text.replace(header1.regex, function (match) {
 			return header1.replace (match);
 		});
 
 		// Parse paragraphs
 		text = text.split ('\n');
-		for (let i = 0; i < text.length; i++) {
-			if (text[i][0] !== '<') {
-				if (text[i] !== '') {
-					text[i] = text[i].replace(paragraph.regex, function (match) {
-						return paragraph.replace (match);
-					});
-				} else {
-					text[i] = `<span class=${paragraph.class}></span>`;
-				}
+		for (let i = 0; i < text.length; i++) {       // For line in text
+			if (text[i][0] !== '<') {                   // If actual line is not an special element
+				text[i] = `<span class=${paragraph.class}>${text[i]}</span>`;
 			}
 		}
 
 		console.log (text);
 		text = text.join ('');
-		
+
 		return text;
 	}
 
