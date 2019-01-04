@@ -1,0 +1,1 @@
+paragraph = new Element();

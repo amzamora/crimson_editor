@@ -1,10 +1,6 @@
+/* Base behaviour for elements on the editor */
+
 class Element {
-	constructor (cls, regex) {
-		this.class = cls
-		this.regex = Element._strToRegex (regex);
-
-	}
-
 	moveCursorLeft (HTMLelement) {
 		let text = HTMLelement.innerHTML;
 		let match = /<span class="cursor"><\/span>/.exec(text);
@@ -39,32 +35,4 @@ class Element {
 			}
 		}
 	}
-
-	replace (match) {
-		return `<span class="${this.class}">${match}</span>`;
-	}
-
-	static _strToRegex (regex) {
-		// Replace conflicting characters
-		regex = regex.replace(/\//g, '&#x2f;');
-		regex = regex.replace(/</g, '&#x3c;');
-		regex = regex.replace(/>/g, '&#x3e;');
-
-		// Convert to regex
-		regex = new RegExp(regex, "gm");
-
-		return regex;
-	}
 }
-
-writedown_elements = [];
-
-/* Paragraph
-   ========= */
-paragraph = new Element ('paragraph', '');
-writedown_elements.push (paragraph);
-
-/* Headers
-   ======= */
-header1 = new Element ('h1', '^# .+$');
-writedown_elements.push (header1);

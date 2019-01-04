@@ -2,8 +2,12 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<script src="src/elements.js"></script>
-		<script src="src/editor.js"></script>
+		<script src="src/js/element.js"></script>
+		<script src="src/js/elements/paragraph.js"></script>
+		<script src="src/js/elements/headers.js"></script>
+		<script src="src/js/elements/blockquote.js"></script>
+		<script src="src/js/parser.js"></script>
+		<script src="src/js/editor.js"></script>
 		<link rel="stylesheet" type="text/css" href="src/css/style.css" media="screen"/>
 		<link rel="stylesheet" type="text/css" href="src/css/elements.css" media="screen"/>
 		<style>
@@ -34,7 +38,7 @@
 		<script>
 			let editor = new CrimsonEditor ('editor');
 			//editor.setText ("Hola, soy un editor");
-			editor.setText ("# This is sóme random text\n\n# Not so random\n\n### Hello, World\nYep!, This is very random text!!! :)");
+			editor.setText ("# This is sóme random text\n## Not so random\n### Hello, World\nYep!, This is very random text!!! :)\nThis is part of the same paragraph.\n> And this is a quote.");
 		</script>
 	</body>
 </html>

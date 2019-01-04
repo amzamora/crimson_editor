@@ -15,3 +15,13 @@ Then you can use the following methods:
 
 ## How does it work
 
+The CrimsonEditor class is on the file editor.js.
+
+The constructor job is to attach events to the editor to handle
+input.
+
+The parser is used when setText method invoked. It receives somo text and
+the editor element. It convert the text into writedown elements and
+puts them on the editor.
+
+The element class is the base behaviour for manipulation for most writedown elements.

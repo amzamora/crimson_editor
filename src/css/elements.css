@@ -1,5 +1,8 @@
 .h1,
-.paragraph {
+.h2,
+.h3,
+.paragraph,
+.blockquote {
 	display: block;
 	height: 1.1em;
 }
@@ -7,4 +10,19 @@
 .h1 {
 	font-weight: bold;
 	font-size: xx-large;
+}
+
+.h2 {
+	font-weight: bold;
+	font-size: x-large;
+}
+
+.h3 {
+	font-weight: bold;
+	font-size: large;
+}
+
+.blockquote {
+	padding: 10px;
+	border-left: 2px solid grey;
 }
