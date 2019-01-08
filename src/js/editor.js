@@ -132,6 +132,8 @@ function Input(editor) {
 	});
 
 	input.addEventListener('input', function (e) {
+			input.value = '';
+
 			let aux = new CustomEvent('keyboard-input');
 			aux.type = 'input';
 			aux.value = e.data;
