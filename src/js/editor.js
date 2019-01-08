@@ -21,8 +21,9 @@ class CrimsonEditor {
 		this._putCursorOnText();
 	}
 
-	insertAtCursor() {
-
+	insertAtCursor(string) {
+		let HTMLelement = this._getElementsWithCursor()[0];
+		HTMLelement.element.insertAtCursor(string, HTMLelement);
 	}
 
 	setFontSize(new_size) {
@@ -58,19 +59,31 @@ class CrimsonEditor {
 	   ========= */
 
 	_onKeyboardInput(e) {
-		if (e.value.length > 1) { // If a special key is pressed
-			// Get element with cursor
-			let HTMLelement = this._getElementsWithCursor()[0];
+		// Get element with cursor
+		let HTMLelement = this._getElementsWithCursor()[0];
 
-			switch (e.value) {
-				case 'left-key':
-					HTMLelement.element.moveCursorLeft(HTMLelement);
-					break;
+		console.log(e.value);
+		switch (e.value) {
+			case 'left-key':
+				HTMLelement.element.moveCursorLeft(HTMLelement);
+				break;
 
-				case 'right-key':
-					HTMLelement.element.moveCursorRight(HTMLelement);
-					break;
-			}
+			case 'right-key':
+				HTMLelement.element.moveCursorRight(HTMLelement);
+				break;
+
+			case 'deletion':
+				HTMLelement.element.deleteAtCursor(HTMLelement);
+				break;
+
+			case 'new-line':
+				this.insertAtCursor('\n');
+				break;
+
+			default:
+				if (e.value.length === 1) {
+					this.insertAtCursor(e.value);
+				}
 		}
 	}
 
@@ -105,6 +118,15 @@ function Input(editor) {
 			} else if (e.keyCode == 40) {
 				aux.value = 'down-key';
 				input.dispatchEvent(aux);
+
+			} else if (e.keyCode == 8){
+				aux.value = 'deletion';
+				input.dispatchEvent(aux);
+
+			} else if (e.keyCode == 13) {
+				aux.value = 'new-line';
+				input.dispatchEvent(aux);
+
 			}
 		}
 	});
@@ -113,7 +135,10 @@ function Input(editor) {
 			let aux = new CustomEvent('keyboard-input');
 			aux.type = 'input';
 			aux.value = e.data;
-			input.dispatchEvent(aux);
+
+			if (e.inputType !== 'deleteContentBackward') {
+				input.dispatchEvent(aux);
+			}
 	});
 
 	return input;

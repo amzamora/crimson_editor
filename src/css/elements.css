@@ -4,7 +4,7 @@
 .paragraph,
 .blockquote {
 	display: block;
-	height: 1.1em;
+	min-height: 1.1em;
 }
 
 .h1 {

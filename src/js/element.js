@@ -1,7 +1,7 @@
 /* Base behaviour for elements on the editor */
 
 class Element {
-	moveCursorLeft (HTMLelement) {
+	moveCursorLeft(HTMLelement) {
 		let text = HTMLelement.innerHTML;
 		let match = /<span class="cursor"><\/span>/.exec(text);
 		if (match.index != 0) {
@@ -19,7 +19,7 @@ class Element {
 		}
 	}
 
-	moveCursorRight (HTMLelement) {
+	moveCursorRight(HTMLelement) {
 		let text = HTMLelement.innerHTML;
 		let match = /<span class="cursor"><\/span>/.exec(text);
 		text = text.replace ('<span class="cursor"></span>', '');
@@ -33,6 +33,21 @@ class Element {
 				HTMLelement = HTMLelement.nextSibling;
 				HTMLelement.innerHTML = '<span class="cursor"></span>' + HTMLelement.innerHTML;
 			}
+		}
+	}
+
+	insertAtCursor(string,  HTMLelement) {
+		HTMLelement.innerHTML = HTMLelement.innerHTML.replace('<span class="cursor"></span>', string + '<span class="cursor"></span>');
+	}
+
+	deleteAtCursor(HTMLelement) {
+		let text = HTMLelement.innerHTML;
+		let match = /<span class="cursor"><\/span>/.exec(text);
+
+		if (match.index !== 0) {
+			text = text.slice(0, match.index - 1) + text.slice(match.index);
+			HTMLelement.innerHTML = text;
+
 		}
 	}
 }
