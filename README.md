@@ -25,3 +25,20 @@ the editor element. It convert the text into writedown elements and
 puts them on the editor.
 
 The element class is the base behaviour for manipulation for most writedown elements.
+
+## To do
+
+### Cursor navigation
+- [ ] Add clickling as a way to move the cursor
+- [ ] Add up arrow and down arrow as ways to move the cursor
+
+### Edition
+- [ ] Selection
+  - [ ] Deletion
+  - [ ] Copy
+- [ ] Image insertion
+
+### Elements
+- [ ] Unordered lists
+- [ ] Ordered lists
+- [ ] Inline elements
