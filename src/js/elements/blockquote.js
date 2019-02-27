@@ -1,1 +1,0 @@
-blockquote = new Element();

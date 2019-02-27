@@ -4,6 +4,7 @@ class CrimsonEditor {
 		this.him = document.getElementById(anchor);
 		this.him.classList.add('CrimsonEditor');
 		this.him.innerHTML = '';
+		this.cursor = new Cursor();
 
 		// Attach callbacks to manage input
 		this.input = Input(this.him);
@@ -18,7 +19,10 @@ class CrimsonEditor {
 
 	setText(text) {
 		Parser.putTextOnEditor(text, this.him);
-		this._putCursorOnText();
+
+		let lines = this.getText().split('\n');
+		this.cursor.setPosition(lines.length, lines[lines.length - 1].length); // setPosition(line, offset);
+
 	}
 
 	insertAtCursor(string) {
@@ -30,28 +34,12 @@ class CrimsonEditor {
 
 	}
 
-
-	/* Utilities
-	   ======== */
-
-	_putCursorOnText() {
-		let last_element = this.him.childNodes[this.him.childNodes.length - 1];
-		last_element.innerHTML += '<span class="cursor"></span>';
-	}
-
-	_getElementsWithCursor() {
-		let cursors = document.getElementsByClassName('cursor');
-		let elements = []
-
-		for (let cursor of cursors) {
-				parent = cursor.parentNode;
-				while (!parent.parentNode.classList.contains('CrimsonEditor')) {
-					parent = parentElement
-				}
-				elements.push(parent);
+	getText() {
+		let text = "";
+		for (let child of this.him.childNodes) {
+			text += child.innerHTML;
 		}
-
-		return elements;
+		return text;
 	}
 
 
@@ -59,31 +47,28 @@ class CrimsonEditor {
 	   ========= */
 
 	_onKeyboardInput(e) {
-		// Get element with cursor
-		let HTMLelement = this._getElementsWithCursor()[0];
-
-		console.log(e.value);
 		switch (e.value) {
 			case 'left-key':
-				HTMLelement.element.moveCursorLeft(HTMLelement);
+				this.cursor.moveLeft(this.him);
 				break;
 
 			case 'right-key':
-				HTMLelement.element.moveCursorRight(HTMLelement);
+				this.cursor.moveRight(this.him);
 				break;
 
-			case 'deletion':
-				HTMLelement.element.deleteAtCursor(HTMLelement);
+			/*case 'deletion':
+				this.cursor.deleteAtCursor(this.editor);
 				break;
 
 			case 'new-line':
 				this.insertAtCursor('\n');
-				break;
+				break;*/
 
 			default:
-				if (e.value.length === 1) {
+				/*if (e.value.length === 1) {
 					this.insertAtCursor(e.value);
-				}
+				}*/
+				break;
 		}
 	}
 
