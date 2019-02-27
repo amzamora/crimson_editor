@@ -4,7 +4,7 @@ class CrimsonEditor {
 		this.him = document.getElementById(anchor);
 		this.him.classList.add('CrimsonEditor');
 		this.him.innerHTML = '';
-		this.cursor = new Cursor();
+		this.cursor = new Cursor(this.him);
 
 		// Attach callbacks to manage input
 		this.input = Input(this.him);
@@ -21,7 +21,7 @@ class CrimsonEditor {
 		Parser.putTextOnEditor(text, this.him);
 
 		let lines = this.getText().split('\n');
-		this.cursor.setPosition(lines.length, lines[lines.length - 1].length); // setPosition(line, offset);
+		this.cursor.setPosition(1, 0); // setPosition(line, offset);
 
 	}
 

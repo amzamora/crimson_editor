@@ -3,8 +3,6 @@ to html elements on the editor  */
 
 class Parser {
 	static putTextOnEditor(text, editor) {
-		editor.innerHTML = '<span class="cursor"></span>';
-
 		text = text.split ('\n');
 		while (text.length !== 0) {
 			let first_char = text[0][0];
