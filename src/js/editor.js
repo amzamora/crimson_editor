@@ -49,11 +49,11 @@ class CrimsonEditor {
 	_onKeyboardInput(e) {
 		switch (e.value) {
 			case 'left-key':
-				this.cursor.moveLeft(this.him);
+				this.cursor.moveLeft();
 				break;
 
 			case 'right-key':
-				this.cursor.moveRight(this.him);
+				this.cursor.moveRight();
 				break;
 
 			/*case 'deletion':

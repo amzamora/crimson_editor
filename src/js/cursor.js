@@ -22,6 +22,8 @@ class Cursor {
 				this.elementWithCursor = child;
 			}
 		}
+
+		this._update();
 	}
 
 	getPosition() {
@@ -32,15 +34,20 @@ class Cursor {
 
 	}
 
-	moveRight(editor) {
+	moveRight() {
 		this.offset += 1;
-		let cursor = document.getElementsByClassName('cursor')[0];
-		cursor.style.left = this._getEditorPadding() + this._textWidth(this.elementWithCursor, this.offset) + 'px';
-		this._restartAnimation(cursor);
+		this._update();
 	}
 
 	/* Private
 	   ======= */
+
+	_update() {
+		let cursor = document.getElementsByClassName('cursor')[0];
+		let textWidth = this._textWidth(this.elementWithCursor, this.offset);
+		cursor.style.left = this._getEditorPadding() + textWidth + 'px';
+		this._restartAnimation(cursor);
+	}
 
 	_getEditorPadding() {
 		let padding = window.getComputedStyle(this.editor, null).getPropertyValue('padding-left');
@@ -48,8 +55,6 @@ class Cursor {
 	}
 
 	_textWidth(element, offset) {
-		console.log(offset);
-
 		// Get text until offset
 		let text = element.innerHTML.replace(/<.*>/, '').substring(0, offset); // To change for inline elements
 
@@ -60,6 +65,7 @@ class Cursor {
 		}
 		copy.innerHTML = text;
 		copy.style.display = "inline-block";
+		copy.style.whiteSpace = "pre";
 
 		element.parentNode.appendChild(copy);
 
@@ -70,6 +76,10 @@ class Cursor {
 		element.parentNode.removeChild(copy);
 
 		return width;
+	}
+
+	_maxWidth() {
+		return this.elementWithCursor.clientWidth;
 	}
 
 	_restartAnimation(cursor) {
