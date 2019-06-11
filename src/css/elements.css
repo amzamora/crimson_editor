@@ -3,27 +3,27 @@
 .h3,
 .paragraph,
 .blockquote {
-	display: block;
-	min-height: 1.1em;
-	white-space: pre-wrap;
+    display: block;
+    min-height: 1.1em;
+    white-space: pre-wrap;
+    margin-bottom: 0.5rem;
 }
 
 .h1 {
-	font-weight: bold;
-	font-size: xx-large;
+    font-weight: bold;
+    font-size: x-large;
 }
 
 .h2 {
-	font-weight: bold;
-	font-size: x-large;
+    font-weight: bold;
+    font-size: large;
 }
 
 .h3 {
-	font-weight: bold;
-	font-size: large;
+    font-weight: bold;
 }
 
 .blockquote {
-	padding: 10px;
-	border-left: 2px solid grey;
+    padding: 10px;
+    border-left: 2px solid grey;
 }

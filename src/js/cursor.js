@@ -1,33 +1,16 @@
 class Cursor {
 	constructor(editor) {
-		this.line = undefined;
 		this.offset = undefined;
 		this.editor = editor;
 		this.elementWithCursor = undefined;
 	}
 
-	setPosition(line, offset) {
-		this.line = line;
-		this.offset = offset;
-
-		// Find html element where cursor should be
-		let lineAux = 0;
-		for (let child of this.editor.childNodes) {
-			let nLines = child.innerHTML.split('\n');
-			if (lineAux < line && line <= lineAux + nLines.length) {
-				// Add cursor
-				child.innerHTML = '<span class="cursor"></span>' + child.innerHTML;
-
-				// Save reference
-				this.elementWithCursor = child;
-			}
-		}
-
-		this._update();
+	setPosition(offset) {
+		//this._update();
 	}
 
 	getPosition() {
-		return {line: this.line, offset: this.offset};
+
 	}
 
 	moveLeft() {
@@ -35,12 +18,11 @@ class Cursor {
 	}
 
 	moveRight() {
-		this.offset += 1;
-		this._update();
+
 	}
 
 	/* Private
-	   ======= */
+		 ======= */
 
 	_update() {
 		let cursor = document.getElementsByClassName('cursor')[0];

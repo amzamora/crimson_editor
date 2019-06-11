@@ -18,7 +18,7 @@ class CrimsonEditor {
 	}
 
 	setText(text) {
-		Parser.putTextOnEditor(text, this.him);
+		Parser.put_text_on_editor(text, this.him);
 
 		let lines = this.getText().split('\n');
 		this.cursor.setPosition(1, 0); // setPosition(line, offset);
@@ -44,7 +44,7 @@ class CrimsonEditor {
 
 
 	/* Callbacks
-	   ========= */
+		 ========= */
 
 	_onKeyboardInput(e) {
 		switch (e.value) {
