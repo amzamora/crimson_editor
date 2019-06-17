@@ -41,7 +41,7 @@ class Parser {
 
 		// Determine what type of header it is
 		let i = 0;
-		while (this.text[i] === '#') {
+		while (this.text[this.index + i] === '#') {
 			i++;
 		}
 		span.classList.add(`h${i}`);
