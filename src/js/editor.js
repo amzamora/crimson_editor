@@ -55,9 +55,9 @@ class CrimsonEditor {
 				this.cursor.deleteAtCursor();
 				break;
 
-			/*case 'new-line':
-				this.insertAtCursor('\n');
-				break;*/
+			case 'new-line':
+				this.cursor.insertAtCursor('\n');
+				break;
 
 			default:
 				if (e.value.length === 1) {

@@ -56,13 +56,35 @@ class Cursor {
 	}
 
 	insertAtCursor(string) {
-		this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', string + '<span class="cursor"></span>');
+		if (string !== '\n') {
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', string + '<span class="cursor"></span>');
+		} else {
+			let span = document.createElement('span');
+			span.classList.add('paragraph');
+
+			let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
+			span.innerHTML = this.elementWithCursor.innerHTML.substr(match.index);
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index);
+
+			if (this.elementWithCursor.nextElementSibling) {
+				this.editor.insertBefore(span, this.elementWithCursor.nextElementSibling);
+			} else {
+				this.editor.appendChild(span);
+			}
+
+			this.elementWithCursor = span;
+		}
 	}
 
 	deleteAtCursor() {
 		let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
-		this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index - 1) + this.elementWithCursor.innerHTML.substr(match.index);
-
+		if (match.index !== 0) {
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index - 1) + this.elementWithCursor.innerHTML.substr(match.index);
+		} else {
+			this.moveLeft();
+			this.elementWithCursor.innerHTML += this.elementWithCursor.nextElementSibling.innerHTML;
+			this.editor.removeChild(this.elementWithCursor.nextElementSibling);
+		}
 	}
 
 	/* Private
