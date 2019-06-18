@@ -21,7 +21,7 @@ class CrimsonEditor {
 		Parser.put_text_on_editor(text, this.him);
 
 		let lines = this.getText().split('\n');
-		this.cursor.setPosition(1, 0); // setPosition(line, offset);
+		this.cursor.setPosition(); // setPosition(element, offset);
 
 	}
 

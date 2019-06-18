@@ -1,33 +1,68 @@
 class Cursor {
 	constructor(editor) {
-		this.offset = undefined;
 		this.editor = editor;
 		this.elementWithCursor = undefined;
 	}
 
-	setPosition(offset) {
-		//this._update();
-	}
+	setPosition(element = -1, offset = -1) {
+		// -1 means the last element
+		if (element === -1) {
+			element = this.editor.children[this.editor.children.length - 1];
+		} else {
+			if (element <= his.editor.children.length - 1) {
+				element = this.editor.children[element];
+			} else {
+				console.log("Error: That HTML element don't exist");
+			}
+		}
 
-	getPosition() {
+		// -1 means the greatest offset possible
+		if (offset === -1) {
+			element.innerHTML += '<span class="cursor"></span>';
+		} else {
+			// Find where to put it
+		}
 
+		this.elementWithCursor = element;
+		this._update();
 	}
 
 	moveLeft() {
-
+		let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
+		if (match.index > 0) {
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '');
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index - 1) + '<span class="cursor"></span>' + this.elementWithCursor.innerHTML.substr(match.index - 1);
+		} else {
+			if (this.elementWithCursor.previousElementSibling) {
+				this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '');
+				this.elementWithCursor = this.elementWithCursor.previousElementSibling;
+				this.elementWithCursor.innerHTML += '<span class="cursor"></span>';
+			}
+		}
 	}
 
 	moveRight() {
-
+		let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
+		if (match.index < this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '').length) {
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '');
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index + 1) + '<span class="cursor"></span>' + this.elementWithCursor.innerHTML.substr(match.index + 1);
+		} else {
+			console.log(this.elementWithCursor.nextElementSibling);
+			if (this.elementWithCursor.nextElementSibling) {
+				this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '');
+				this.elementWithCursor = this.elementWithCursor.nextElementSibling;
+				this.elementWithCursor.innerHTML = '<span class="cursor"></span>' + this.elementWithCursor.innerHTML;
+			}
+		}
 	}
 
 	/* Private
-		 ======= */
+	   ======= */
 
 	_update() {
 		let cursor = document.getElementsByClassName('cursor')[0];
-		let textWidth = this._textWidth(this.elementWithCursor, this.offset);
-		cursor.style.left = this._getEditorPadding() + textWidth + 'px';
+		/*let textWidth = this._textWidth(this.elementWithCursor, this.offset);
+		cursor.style.left = this._getEditorPadding() + textWidth + 'px';*/
 		this._restartAnimation(cursor);
 	}
 
