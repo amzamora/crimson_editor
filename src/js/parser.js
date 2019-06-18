@@ -29,7 +29,7 @@ class Parser {
 			i++;
 		}
 
-		if (this.text[i] === ' ' && i - index <= 5) {
+		if (i - index !== 0 && this.text[i] === ' ' && i - index <= 5) {
 			return true;
 		} else {
 			return false;
@@ -65,6 +65,11 @@ class Parser {
 				if (this._is_new_element()) {
 					break;
 				}
+
+				this.index++;
+				if (this.text[this.index] !== ' ') {
+					span.innerHTML += ' ';
+				}
 			}
 
 			span.innerHTML += this.text[this.index];
@@ -78,7 +83,6 @@ class Parser {
 	static _is_new_element() {
 		if (this.text[this.index + 1] === '\n' || this._is_header(this.index + 1)) {
 			return true;
-
 		} else {
 			return false;
 		}
