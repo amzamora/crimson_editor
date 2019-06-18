@@ -29,7 +29,7 @@ class Parser {
 			i++;
 		}
 
-		if (i - index !== 0 && this.text[i] === ' ' && i - index <= 5) {
+		if (i - index !== 0 && this.text[i] === ' ' && i - index <= 3) {
 			return true;
 		} else {
 			return false;

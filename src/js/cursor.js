@@ -57,7 +57,12 @@ class Cursor {
 
 	insertAtCursor(string) {
 		if (string !== '\n') {
+			let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
 			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', string + '<span class="cursor"></span>');
+
+			if (match.index < 5) {
+				this._revaluate_element_class();
+			}
 		} else {
 			let span = document.createElement('span');
 			span.classList.add('paragraph');
@@ -80,6 +85,10 @@ class Cursor {
 		let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
 		if (match.index !== 0) {
 			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index - 1) + this.elementWithCursor.innerHTML.substr(match.index);
+
+			if (match.index < 5) {
+				this._revaluate_element_class();
+			}
 		} else {
 			this.moveLeft();
 			this.elementWithCursor.innerHTML += this.elementWithCursor.nextElementSibling.innerHTML;
@@ -133,5 +142,29 @@ class Cursor {
 	_restartAnimation(cursor) {
 		let cln = cursor.cloneNode(true);
 		cursor.parentNode.replaceChild(cln, cursor);
+	}
+
+	_revaluate_element_class() {
+		let text = this._as_plain_text(this.elementWithCursor.innerHTML);
+
+		if (text[0] === '#') {
+			let i = 0;
+			while (text[i] === '#') {
+				i++;
+			}
+
+			if (text[i] === ' ' && i <= 3) {
+				this.elementWithCursor.className = `h${i}`;
+			} else {
+				this.elementWithCursor.className = 'paragraph';
+			}
+
+		} else {
+			this.elementWithCursor.className = 'paragraph';
+		}
+	}
+
+	_as_plain_text(string) {
+		return string.replace(/<span.*>.*<\/span>/g, '');
 	}
 }
