@@ -47,13 +47,22 @@ class Cursor {
 			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '');
 			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index + 1) + '<span class="cursor"></span>' + this.elementWithCursor.innerHTML.substr(match.index + 1);
 		} else {
-			console.log(this.elementWithCursor.nextElementSibling);
 			if (this.elementWithCursor.nextElementSibling) {
 				this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '');
 				this.elementWithCursor = this.elementWithCursor.nextElementSibling;
 				this.elementWithCursor.innerHTML = '<span class="cursor"></span>' + this.elementWithCursor.innerHTML;
 			}
 		}
+	}
+
+	insertAtCursor(string) {
+		this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', string + '<span class="cursor"></span>');
+	}
+
+	deleteAtCursor() {
+		let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
+		this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index - 1) + this.elementWithCursor.innerHTML.substr(match.index);
+
 	}
 
 	/* Private

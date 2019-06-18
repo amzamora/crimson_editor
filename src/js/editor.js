@@ -25,11 +25,6 @@ class CrimsonEditor {
 
 	}
 
-	insertAtCursor(string) {
-		let HTMLelement = this._getElementsWithCursor()[0];
-		HTMLelement.element.insertAtCursor(string, HTMLelement);
-	}
-
 	setFontSize(new_size) {
 
 	}
@@ -56,18 +51,18 @@ class CrimsonEditor {
 				this.cursor.moveRight();
 				break;
 
-			/*case 'deletion':
-				this.cursor.deleteAtCursor(this.editor);
+			case 'deletion':
+				this.cursor.deleteAtCursor();
 				break;
 
-			case 'new-line':
+			/*case 'new-line':
 				this.insertAtCursor('\n');
 				break;*/
 
 			default:
-				/*if (e.value.length === 1) {
-					this.insertAtCursor(e.value);
-				}*/
+				if (e.value.length === 1) {
+					this.cursor.insertAtCursor(e.value);
+				}
 				break;
 		}
 	}
