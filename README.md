@@ -1,11 +1,11 @@
-# Crimson editor
+# Typo editor
 
-Created to have completely freedom for my app [Crimson](https://github.com/amzamora/crimson).
+Created to have completely freedom for my app [Typo](https://github.com/amzamora/typo).
 
 ## How to use it
 
 You createad and HTML file with a pre element with and id. Then you pass that id when instantiating
-CrimsonEditor.
+TypoEditor.
 
 Then you can use the following methods:
 
@@ -15,7 +15,7 @@ Then you can use the following methods:
 
 ## How does it work
 
-The CrimsonEditor class is on the file editor.js.
+The TypoEditor class is on the file editor.js.
 
 The constructor job is to attach events to the editor to handle
 input.

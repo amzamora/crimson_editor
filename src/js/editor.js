@@ -1,4 +1,4 @@
-class CrimsonEditor {
+class TypoEditor {
 	constructor (anchor) {
 		// Initialize editor
 		this.him = document.getElementById(anchor);
