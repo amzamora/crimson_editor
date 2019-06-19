@@ -61,7 +61,7 @@ class Cursor {
 			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', string + '<span class="cursor"></span>');
 
 			if (match.index < 5) {
-				this._revaluate_element_class();
+				this._revaluate_element_class(this.elementWithCursor);
 			}
 		} else {
 			let span = document.createElement('span');
@@ -77,6 +77,9 @@ class Cursor {
 				this.editor.appendChild(span);
 			}
 
+			this._revaluate_element_class(this.elementWithCursor);
+			this._revaluate_element_class(span);
+
 			this.elementWithCursor = span;
 		}
 	}
@@ -87,7 +90,7 @@ class Cursor {
 			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index - 1) + this.elementWithCursor.innerHTML.substr(match.index);
 
 			if (match.index < 5) {
-				this._revaluate_element_class();
+				this._revaluate_element_class(this.elementWithCursor);
 			}
 		} else {
 			this.moveLeft();
@@ -144,8 +147,8 @@ class Cursor {
 		cursor.parentNode.replaceChild(cln, cursor);
 	}
 
-	_revaluate_element_class() {
-		let text = this._as_plain_text(this.elementWithCursor.innerHTML);
+	_revaluate_element_class(element) {
+		let text = this._as_plain_text(element.innerHTML);
 
 		if (text[0] === '#') {
 			let i = 0;
@@ -154,13 +157,13 @@ class Cursor {
 			}
 
 			if (text[i] === ' ' && i <= 3) {
-				this.elementWithCursor.className = `h${i}`;
+				element.className = `h${i}`;
 			} else {
-				this.elementWithCursor.className = 'paragraph';
+				element.className = 'paragraph';
 			}
 
 		} else {
-			this.elementWithCursor.className = 'paragraph';
+			element.className = 'paragraph';
 		}
 	}
 
