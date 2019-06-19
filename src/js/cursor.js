@@ -29,9 +29,12 @@ class Cursor {
 
 	moveLeft() {
 		let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
+		
+		// At the start of element
 		if (match.index > 0) {
 			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '');
 			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index - 1) + '<span class="cursor"></span>' + this.elementWithCursor.innerHTML.substr(match.index - 1);
+
 		} else {
 			if (this.elementWithCursor.previousElementSibling) {
 				this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '');
@@ -43,9 +46,12 @@ class Cursor {
 
 	moveRight() {
 		let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
+
+		// At the end of element
 		if (match.index < this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '').length) {
 			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '');
 			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index + 1) + '<span class="cursor"></span>' + this.elementWithCursor.innerHTML.substr(match.index + 1);
+
 		} else {
 			if (this.elementWithCursor.nextElementSibling) {
 				this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '');
@@ -53,6 +59,29 @@ class Cursor {
 				this.elementWithCursor.innerHTML = '<span class="cursor"></span>' + this.elementWithCursor.innerHTML;
 			}
 		}
+	}
+
+	moveUp() {
+		// Get horizontal offset of cursor on pixels
+		let horizontal_offset = this.elementWithCursor.getElementsByClassName('cursor')[0].offsetLeft;
+
+		// Check if we are in the first line of the current element
+		let line_height = this._get_line_height(this.elementWithCursor);
+		let offset_top_element = this.elementWithCursor.offsetTop;
+		let offset_top_cursor = this.elementWithCursor.getElementsByClassName('cursor')[0].offsetTop;
+
+		let line = 1;
+		while(offset_top_element < offset_top_cursor) {
+			offset_top_element += line_height;
+			line++;
+		}
+		console.log(line);
+
+		// Find where to put it
+	}
+
+	moveDown() {
+
 	}
 
 	insertAtCursor(string) {
@@ -109,6 +138,45 @@ class Cursor {
 		this._restartAnimation(cursor);
 	}
 
+	_restartAnimation(cursor) {
+		let cln = cursor.cloneNode(true);
+		cursor.parentNode.replaceChild(cln, cursor);
+	}
+
+	_revaluate_element_class(element) {
+		let text = this._as_plain_text(element.innerHTML);
+
+		if (text[0] === '#') {
+			let i = 0;
+			while (text[i] === '#') {
+				i++;
+			}
+
+			if (text[i] === ' ' && i <= 3) {
+				element.className = `h${i}`;
+			} else {
+				element.className = 'paragraph';
+			}
+
+		} else {
+			element.className = 'paragraph';
+		}
+	}
+
+	_as_plain_text(string) {
+		return string.replace(/<span.*>.*<\/span>/g, '');
+	}
+
+	_get_line_height(element) {
+		let clone = element.cloneNode();
+		clone.innerHTML = 'a';
+		this.editor.appendChild(clone);
+		let line_height = clone.clientHeight;
+		this.editor.removeChild(clone);
+
+		return line_height;
+	}
+
 	_getEditorPadding() {
 		let padding = window.getComputedStyle(this.editor, null).getPropertyValue('padding-left');
 		return Number(padding.substr(0, padding.length - 2));
@@ -142,32 +210,4 @@ class Cursor {
 		return this.elementWithCursor.clientWidth;
 	}
 
-	_restartAnimation(cursor) {
-		let cln = cursor.cloneNode(true);
-		cursor.parentNode.replaceChild(cln, cursor);
-	}
-
-	_revaluate_element_class(element) {
-		let text = this._as_plain_text(element.innerHTML);
-
-		if (text[0] === '#') {
-			let i = 0;
-			while (text[i] === '#') {
-				i++;
-			}
-
-			if (text[i] === ' ' && i <= 3) {
-				element.className = `h${i}`;
-			} else {
-				element.className = 'paragraph';
-			}
-
-		} else {
-			element.className = 'paragraph';
-		}
-	}
-
-	_as_plain_text(string) {
-		return string.replace(/<span.*>.*<\/span>/g, '');
-	}
 }

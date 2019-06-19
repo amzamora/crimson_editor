@@ -10,6 +10,7 @@
 	border-left: 1px solid transparent; /* Why it does not work without it?*/
 	position: absolute;
 	animation: blink 0.6s step-start infinite alternate;
+	white-space: nowrap;
 }
 
 @keyframes blink {

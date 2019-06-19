@@ -51,6 +51,10 @@ class TypoEditor {
 				this.cursor.moveRight();
 				break;
 
+			case 'up-key':
+				this.cursor.moveUp();
+				break;
+
 			case 'deletion':
 				this.cursor.deleteAtCursor();
 				break;
