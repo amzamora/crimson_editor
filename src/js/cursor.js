@@ -82,6 +82,9 @@ class Cursor {
 		let offset_top_element = this.elementWithCursor.offsetTop;
 		let offset_top_cursor = this.elementWithCursor.getElementsByClassName('cursor')[0].offsetTop;
 
+		console.log("line height: " + line_height);
+		console.log("cursor_offset_height: " + this.elementWithCursor.getElementsByClassName('cursor')[0].offsetHeight);
+
 		let line = 1;
 		while(offset_top_element < offset_top_cursor) {
 			offset_top_element += line_height;
@@ -105,10 +108,12 @@ class Cursor {
 				this._revaluate_element_class(this.elementWithCursor);
 			}
 		} else {
+			this.elementWithCursor.innerHTML = this._as_plain_text(this.elementWithCursor.innerHTML);
+
 			let span = document.createElement('span');
 			span.classList.add('paragraph');
 
-			span.innerHTML = this.elementWithCursor.innerHTML.substr(this.offset);
+			span.innerHTML = this.cursor + this.elementWithCursor.innerHTML.substr(this.offset);
 			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset);
 			this.offset = 0;
 
@@ -177,7 +182,7 @@ class Cursor {
 		let clone = element.cloneNode();
 		clone.innerHTML = 'a';
 		this.editor.appendChild(clone);
-		let line_height = clone.clientHeight;
+		let line_height = clone.offsetHeight;
 		this.editor.removeChild(clone);
 
 		return line_height;
