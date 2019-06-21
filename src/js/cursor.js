@@ -125,6 +125,7 @@ class Cursor {
 			this.moveLeft();
 			this.elementWithCursor.innerHTML += this.elementWithCursor.nextElementSibling.innerHTML;
 			this.editor.removeChild(this.elementWithCursor.nextElementSibling);
+			this._revaluate_element_class(this.elementWithCursor);
 		}
 	}
 
