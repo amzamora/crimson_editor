@@ -2,6 +2,7 @@ class Cursor {
 	constructor(editor) {
 		this.editor = editor;
 		this.elementWithCursor = undefined;
+		this.offset = undefined; // Offset in the element as plain text
 		this.cursor = '<span class="cursor"></span>';
 	}
 
@@ -19,6 +20,7 @@ class Cursor {
 
 		// -1 means the greatest offset possible
 		if (offset === -1) {
+			this.offset = element.innerHTML.length;
 			element.innerHTML += this.cursor;
 		} else {
 			// Find where to put it
@@ -28,36 +30,46 @@ class Cursor {
 	}
 
 	moveLeft() {
-		let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
+		this.elementWithCursor.innerHTML = this._as_plain_text(this.elementWithCursor.innerHTML);
 
-		// At the start of element
-		if (match.index > 0) {
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace(this.cursor, '');
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index - 1) + this.cursor + this.elementWithCursor.innerHTML.substr(match.index - 1);
+		// If not at the start of element
+		if (this.offset > 0) {
+			this.offset--;
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset) + this.cursor + this.elementWithCursor.innerHTML.substr(this.offset);
 
 		} else {
 			if (this.elementWithCursor.previousElementSibling) {
-				this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace(this.cursor, '');
 				this.elementWithCursor = this.elementWithCursor.previousElementSibling;
+				this.offset = this.elementWithCursor.innerHTML.length;
 				this.elementWithCursor.innerHTML += this.cursor;
 			}
+		}
+
+		let match = /\w+<span class="cursor"><\/span>\w+/.exec(this.elementWithCursor.innerHTML);
+		if (match) {
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index) + '<span style="white-space: nowrap;">'+ match[0] + '</span>' + this.elementWithCursor.innerHTML.substr(match.index + match[0].length);
 		}
 	}
 
 	moveRight() {
-		let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
+		this.elementWithCursor.innerHTML = this._as_plain_text(this.elementWithCursor.innerHTML);
 
 		// At the end of element
-		if (match.index < this.elementWithCursor.innerHTML.replace(this.cursor, '').length) {
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace(this.cursor, '');
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index + 1) + this.cursor + this.elementWithCursor.innerHTML.substr(match.index + 1);
+		if (this.offset < this.elementWithCursor.innerHTML.replace(this.cursor, '').length) {
+			this.offset++;
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset) + this.cursor + this.elementWithCursor.innerHTML.substr(this.offset);
 
 		} else {
 			if (this.elementWithCursor.nextElementSibling) {
-				this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace(this.cursor, '');
 				this.elementWithCursor = this.elementWithCursor.nextElementSibling;
+				this.offset = 0;
 				this.elementWithCursor.innerHTML = this.cursor + this.elementWithCursor.innerHTML;
 			}
+		}
+
+		let match = /\w+<span class="cursor"><\/span>\w+/.exec(this.elementWithCursor.innerHTML);
+		if (match) {
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index) + '<span style="white-space: nowrap;">'+ match[0] + '</span>' + this.elementWithCursor.innerHTML.substr(match.index + match[0].length);
 		}
 	}
 
@@ -86,19 +98,19 @@ class Cursor {
 
 	insertAtCursor(string) {
 		if (string !== '\n') {
-			let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace(this.cursor, string + this.cursor);
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset) + string + this.elementWithCursor.innerHTML.substr(this.offset);
+			this.offset += string.length;
 
-			if (match.index < 5) {
+			if (this.offset < 5) {
 				this._revaluate_element_class(this.elementWithCursor);
 			}
 		} else {
 			let span = document.createElement('span');
 			span.classList.add('paragraph');
 
-			let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
-			span.innerHTML = this.elementWithCursor.innerHTML.substr(match.index);
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index);
+			span.innerHTML = this.elementWithCursor.innerHTML.substr(this.offset);
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset);
+			this.offset = 0;
 
 			if (this.elementWithCursor.nextElementSibling) {
 				this.editor.insertBefore(span, this.elementWithCursor.nextElementSibling);
@@ -114,11 +126,11 @@ class Cursor {
 	}
 
 	deleteAtCursor() {
-		let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
-		if (match.index !== 0) {
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index - 1) + this.elementWithCursor.innerHTML.substr(match.index);
+		if (this.offset !== 0) {
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset - 1) + this.elementWithCursor.innerHTML.substr(this.offset);
+			this.offset--;
 
-			if (match.index < 5) {
+			if (this.offset < 5) {
 				this._revaluate_element_class(this.elementWithCursor);
 			}
 		} else {
@@ -158,7 +170,7 @@ class Cursor {
 	}
 
 	_as_plain_text(string) {
-		return string.replace(/<span.*>.*<\/span>/g, '');
+		return string.replace(/(<span.*?>|<\/span>)/g, '');
 	}
 
 	_get_line_height(element) {
