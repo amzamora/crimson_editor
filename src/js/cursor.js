@@ -78,19 +78,14 @@ class Cursor {
 		let horizontal_offset = this.elementWithCursor.getElementsByClassName('cursor')[0].offsetLeft;
 
 		// Check if we are in the first line of the current element
-		let line_height = this._get_line_height(this.elementWithCursor);
-		let offset_top_element = this.elementWithCursor.offsetTop;
-		let offset_top_cursor = this.elementWithCursor.getElementsByClassName('cursor')[0].offsetTop;
+		let offsetTopElement = this.elementWithCursor.offsetTop;
+		let offsetTopCursor = this.elementWithCursor.getElementsByClassName('cursor')[0].offsetTop;
 
-		console.log("line height: " + line_height);
-		console.log("cursor_offset_height: " + this.elementWithCursor.getElementsByClassName('cursor')[0].offsetHeight);
-
-		let line = 1;
-		while(offset_top_element < offset_top_cursor) {
-			offset_top_element += line_height;
-			line++;
+		if (offsetTopElement === offsetTopCursor) {
+			console.log ("Cursor in line 1");
+		} else {
+			console.log ("Cursor not in line 1");
 		}
-		console.log(line);
 
 		// Find where to put it
 	}
@@ -101,11 +96,17 @@ class Cursor {
 
 	insertAtCursor(string) {
 		if (string !== '\n') {
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset) + string + this.elementWithCursor.innerHTML.substr(this.offset);
+			this.elementWithCursor.innerHTML = this._as_plain_text(this.elementWithCursor.innerHTML);
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset) + string + this.cursor + this.elementWithCursor.innerHTML.substr(this.offset);
 			this.offset += string.length;
 
 			if (this.offset < 5) {
 				this._revaluate_element_class(this.elementWithCursor);
+			}
+
+			let match = /\w+<span class="cursor"><\/span>\w+/.exec(this.elementWithCursor.innerHTML);
+			if (match) {
+				this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index) + '<span style="white-space: nowrap;">'+ match[0] + '</span>' + this.elementWithCursor.innerHTML.substr(match.index + match[0].length);
 			}
 		} else {
 			this.elementWithCursor.innerHTML = this._as_plain_text(this.elementWithCursor.innerHTML);
@@ -182,7 +183,7 @@ class Cursor {
 		let clone = element.cloneNode();
 		clone.innerHTML = 'a';
 		this.editor.appendChild(clone);
-		let line_height = clone.offsetHeight;
+		let line_height = clone.clientHeight;
 		this.editor.removeChild(clone);
 
 		return line_height;
@@ -195,7 +196,7 @@ class Cursor {
 
 	_textWidth(element, offset) {
 		// Get text until offset
-		let text = element.innerHTML.replace(/<.*>/, '').substring(0, offset); // To change for inline elements
+		let text = this._as_plain_text(element.innerHTML).substring(0, offset); // To change for inline elements
 
 		// Put it on editor with same context
 		let copy = document.createElement('span');
