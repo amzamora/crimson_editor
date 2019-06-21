@@ -2,6 +2,7 @@ class Cursor {
 	constructor(editor) {
 		this.editor = editor;
 		this.elementWithCursor = undefined;
+		this.cursor = '<span class="cursor"></span>';
 	}
 
 	setPosition(element = -1, offset = -1) {
@@ -18,28 +19,27 @@ class Cursor {
 
 		// -1 means the greatest offset possible
 		if (offset === -1) {
-			element.innerHTML += '<span class="cursor"></span>';
+			element.innerHTML += this.cursor;
 		} else {
 			// Find where to put it
 		}
 
 		this.elementWithCursor = element;
-		this._update();
 	}
 
 	moveLeft() {
 		let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
-		
+
 		// At the start of element
 		if (match.index > 0) {
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '');
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index - 1) + '<span class="cursor"></span>' + this.elementWithCursor.innerHTML.substr(match.index - 1);
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace(this.cursor, '');
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index - 1) + this.cursor + this.elementWithCursor.innerHTML.substr(match.index - 1);
 
 		} else {
 			if (this.elementWithCursor.previousElementSibling) {
-				this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '');
+				this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace(this.cursor, '');
 				this.elementWithCursor = this.elementWithCursor.previousElementSibling;
-				this.elementWithCursor.innerHTML += '<span class="cursor"></span>';
+				this.elementWithCursor.innerHTML += this.cursor;
 			}
 		}
 	}
@@ -48,15 +48,15 @@ class Cursor {
 		let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
 
 		// At the end of element
-		if (match.index < this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '').length) {
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '');
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index + 1) + '<span class="cursor"></span>' + this.elementWithCursor.innerHTML.substr(match.index + 1);
+		if (match.index < this.elementWithCursor.innerHTML.replace(this.cursor, '').length) {
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace(this.cursor, '');
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index + 1) + this.cursor + this.elementWithCursor.innerHTML.substr(match.index + 1);
 
 		} else {
 			if (this.elementWithCursor.nextElementSibling) {
-				this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', '');
+				this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace(this.cursor, '');
 				this.elementWithCursor = this.elementWithCursor.nextElementSibling;
-				this.elementWithCursor.innerHTML = '<span class="cursor"></span>' + this.elementWithCursor.innerHTML;
+				this.elementWithCursor.innerHTML = this.cursor + this.elementWithCursor.innerHTML;
 			}
 		}
 	}
@@ -87,7 +87,7 @@ class Cursor {
 	insertAtCursor(string) {
 		if (string !== '\n') {
 			let match = /<span class="cursor"><\/span>/.exec(this.elementWithCursor.innerHTML);
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace('<span class="cursor"></span>', string + '<span class="cursor"></span>');
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace(this.cursor, string + this.cursor);
 
 			if (match.index < 5) {
 				this._revaluate_element_class(this.elementWithCursor);
@@ -130,13 +130,6 @@ class Cursor {
 
 	/* Private
 	   ======= */
-
-	_update() {
-		let cursor = document.getElementsByClassName('cursor')[0];
-		/*let textWidth = this._textWidth(this.elementWithCursor, this.offset);
-		cursor.style.left = this._getEditorPadding() + textWidth + 'px';*/
-		this._restartAnimation(cursor);
-	}
 
 	_restartAnimation(cursor) {
 		let cln = cursor.cloneNode(true);
