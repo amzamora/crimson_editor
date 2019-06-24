@@ -4,6 +4,13 @@ class Cursor {
 		this.elementWithCursor = undefined;
 		this.offset = undefined; // Offset in the element as plain text
 		this.cursor = '<span class="cursor"></span>';
+
+		let self = this;
+		window.addEventListener('resize', function(e) {
+			for (let child of self.editor.children) {
+				self._update(child);
+			}
+		});
 	}
 
 	setPosition(element = -1, offset = -1) {
@@ -27,50 +34,41 @@ class Cursor {
 		}
 
 		this.elementWithCursor = element;
+
+		// Update elements
+		for (let child of self.editor.children) {
+			this._update(child);
+		}
 	}
 
 	moveLeft() {
-		this.elementWithCursor.innerHTML = this._as_plain_text(this.elementWithCursor.innerHTML);
-
 		// If not at the start of element
 		if (this.offset > 0) {
 			this.offset--;
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset) + this.cursor + this.elementWithCursor.innerHTML.substr(this.offset);
 
 		} else {
 			if (this.elementWithCursor.previousElementSibling) {
 				this.elementWithCursor = this.elementWithCursor.previousElementSibling;
 				this.offset = this.elementWithCursor.innerHTML.length;
-				this.elementWithCursor.innerHTML += this.cursor;
 			}
 		}
 
-		let match = /\w+<span class="cursor"><\/span>\w+/.exec(this.elementWithCursor.innerHTML);
-		if (match) {
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index) + '<span style="white-space: nowrap;">'+ match[0] + '</span>' + this.elementWithCursor.innerHTML.substr(match.index + match[0].length);
-		}
+		this._update(this.elementWithCursor);
 	}
 
 	moveRight() {
-		this.elementWithCursor.innerHTML = this._as_plain_text(this.elementWithCursor.innerHTML);
-
 		// At the end of element
-		if (this.offset < this.elementWithCursor.innerHTML.replace(this.cursor, '').length) {
+		if (this.offset < this.elementWithCursor.innerHTML.length) {
 			this.offset++;
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset) + this.cursor + this.elementWithCursor.innerHTML.substr(this.offset);
 
 		} else {
 			if (this.elementWithCursor.nextElementSibling) {
 				this.elementWithCursor = this.elementWithCursor.nextElementSibling;
 				this.offset = 0;
-				this.elementWithCursor.innerHTML = this.cursor + this.elementWithCursor.innerHTML;
 			}
 		}
 
-		let match = /\w+<span class="cursor"><\/span>\w+/.exec(this.elementWithCursor.innerHTML);
-		if (match) {
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index) + '<span style="white-space: nowrap;">'+ match[0] + '</span>' + this.elementWithCursor.innerHTML.substr(match.index + match[0].length);
-		}
+		this._update(this.elementWithCursor);
 	}
 
 	moveUp() {
@@ -78,14 +76,6 @@ class Cursor {
 		let horizontal_offset = this.elementWithCursor.getElementsByClassName('cursor')[0].offsetLeft;
 
 		// Check if we are in the first line of the current element
-		let offsetTopElement = this.elementWithCursor.offsetTop;
-		let offsetTopCursor = this.elementWithCursor.getElementsByClassName('cursor')[0].offsetTop;
-
-		if (offsetTopElement === offsetTopCursor) {
-			console.log ("Cursor in line 1");
-		} else {
-			console.log ("Cursor not in line 1");
-		}
 
 		// Find where to put it
 	}
@@ -96,27 +86,20 @@ class Cursor {
 
 	insertAtCursor(string) {
 		if (string !== '\n') {
-			this.elementWithCursor.innerHTML = this._as_plain_text(this.elementWithCursor.innerHTML);
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset) + string + this.cursor + this.elementWithCursor.innerHTML.substr(this.offset);
+			/*this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset) + string + this.elementWithCursor.innerHTML.substr(this.offset);
 			this.offset += string.length;
 
 			if (this.offset < 5) {
 				this._revaluate_element_class(this.elementWithCursor);
-			}
+			}*/
 
-			let match = /\w+<span class="cursor"><\/span>\w+/.exec(this.elementWithCursor.innerHTML);
-			if (match) {
-				this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index) + '<span style="white-space: nowrap;">'+ match[0] + '</span>' + this.elementWithCursor.innerHTML.substr(match.index + match[0].length);
-			}
 		} else {
-			this.elementWithCursor.innerHTML = this._as_plain_text(this.elementWithCursor.innerHTML);
-
-			let span = document.createElement('span');
+			/*let span = document.createElement('span');
 			span.classList.add('paragraph');
+			span.innerHTML = this.elementWithCursor.innerHTML.substr(this.offset);
 
-			span.innerHTML = this.cursor + this.elementWithCursor.innerHTML.substr(this.offset);
 			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset);
-			this.offset = 0;
+			//this._update(); Other things should be here. like for wrappping and stuff
 
 			if (this.elementWithCursor.nextElementSibling) {
 				this.editor.insertBefore(span, this.elementWithCursor.nextElementSibling);
@@ -128,22 +111,25 @@ class Cursor {
 			this._revaluate_element_class(span);
 
 			this.elementWithCursor = span;
+			this.offset = 0;*/
 		}
+
+		this._update(this.elementWithCursor);
 	}
 
 	deleteAtCursor() {
 		if (this.offset !== 0) {
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset - 1) + this.elementWithCursor.innerHTML.substr(this.offset);
+			/*this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset - 1) + this.elementWithCursor.innerHTML.substr(this.offset);
 			this.offset--;
 
 			if (this.offset < 5) {
 				this._revaluate_element_class(this.elementWithCursor);
-			}
+			}*/
 		} else {
-			this.moveLeft();
+			/*this.moveLeft();
 			this.elementWithCursor.innerHTML += this.elementWithCursor.nextElementSibling.innerHTML;
 			this.editor.removeChild(this.elementWithCursor.nextElementSibling);
-			this._revaluate_element_class(this.elementWithCursor);
+			this._revaluate_element_class(this.elementWithCursor);*/
 		}
 	}
 
@@ -153,6 +139,44 @@ class Cursor {
 	_restartAnimation(cursor) {
 		let cln = cursor.cloneNode(true);
 		cursor.parentNode.replaceChild(cln, cursor);
+	}
+
+	_update(element) {
+		element.innerHTML = this._as_plain_text(element.innerHTML);
+		this._wrapText(element);
+	}
+
+	_wrapText(element) {
+		let clone = element.cloneNode(false);
+		clone.style.display = "inline-block";
+		this.editor.appendChild(clone);
+
+		let words = element.innerHTML.split(' ');
+		clone.innerHTML += words.shift();
+		for (let word of words) {
+			clone.innerHTML += ' ';
+
+			if (word.length === 0) {
+				clone.innerHTML += ' ';
+			} else {
+				clone.innerHTML += word;
+			}
+
+			if (this.elementWithCursor.clientWidth < clone.clientWidth) {
+				// Find previos inserted ' ' and replace it with <br>
+				let i = clone.innerHTML.length;
+				while (i > 0) {
+					if (clone.innerHTML[i] === ' ') {
+						clone.innerHTML = clone.innerHTML.substr(0, i) + '<br>' + clone.innerHTML.substr(i + 1);
+						break;
+					}
+					i--;
+				}
+			}
+		}
+
+		element.innerHTML = clone.innerHTML;
+		this.editor.removeChild(clone);
 	}
 
 	_revaluate_element_class(element) {
@@ -176,6 +200,7 @@ class Cursor {
 	}
 
 	_as_plain_text(string) {
+		string = string.replace(/<br>/g, ' ');
 		return string.replace(/(<span.*?>|<\/span>)/g, '');
 	}
 
@@ -194,32 +219,10 @@ class Cursor {
 		return Number(padding.substr(0, padding.length - 2));
 	}
 
-	_textWidth(element, offset) {
-		// Get text until offset
-		let text = this._as_plain_text(element.innerHTML).substring(0, offset); // To change for inline elements
 
-		// Put it on editor with same context
-		let copy = document.createElement('span');
-		for (let cls of element.classList) {
-			copy.classList.add(cls);
-		}
-		copy.innerHTML = text;
-		copy.style.display = "inline-block";
-		copy.style.whiteSpace = "pre";
-
-		element.parentNode.appendChild(copy);
-
-		// Measure
-		let width = copy.clientWidth;
-
-		// Revert changes and return
-		element.parentNode.removeChild(copy);
-
-		return width;
-	}
 
 	_maxWidth() {
-		return this.elementWithCursor.clientWidth;
+		return this.editor.clientWidth;
 	}
 
 }
