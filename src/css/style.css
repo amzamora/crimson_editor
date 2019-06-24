@@ -5,7 +5,7 @@
 	position: relative;
 }
 
-.cursor {
+cursor {
 	height: 1.1em;
 	border-left: 1px solid transparent; /* Why it does not work without it?*/
 	position: absolute;
