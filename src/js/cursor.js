@@ -3,6 +3,7 @@ class Cursor {
 		this.editor = editor;
 		this.elementWithCursor = undefined;
 		this.cursor = '<cursor></cursor>';
+		this.pixel_offset = -1;
 	}
 
 	setPosition(element = -1, offset = -1) {
@@ -79,11 +80,40 @@ class Cursor {
 
 	moveUp() {
 		// Get horizontal offset of cursor on pixels
-		let horizontal_offset = this.elementWithCursor.getElementsByClassName('cursor')[0].offsetLeft;
+		let pixelOffset = this.elementWithCursor.getElementsByTagName('cursor')[0].offsetLeft;
 
-		// Check if we are in the first line of the current element
+		// Find line with cursor
+		let line = 0;
+		let lines = this.elementWithCursor.innerHTML.split('<br>');
+		for (let aux of lines) {
+			if (aux.includes(this.cursor)) {
+				break;
+			}
+			line++;
+		}
 
-		// Find where to put it
+		// Realocate cursor
+		if (line !== 0) {
+			lines[line] = lines[line].replace(this.cursor, '');
+			let offset = this._findCharOffset(this.elementWithCursor, lines[line - 1], pixelOffset - this.elementWithCursor.offsetLeft);
+			lines[line - 1] = lines[line - 1].substr(0, offset) + this.cursor + lines[line - 1].substr(offset);
+
+			this.elementWithCursor.innerHTML = lines.join('<br>');
+		} else {
+			if (this.elementWithCursor.previousElementSibling) {
+				lines[line] = lines[line].replace(this.cursor, '');
+				this.elementWithCursor.innerHTML = lines.join('<br>');
+
+				let prev = this.elementWithCursor.previousElementSibling;
+
+				lines = prev.innerHTML.split('<br>');
+				let offset = this._findCharOffset(prev, lines[lines.length - 1], pixelOffset - this.elementWithCursor.offsetLeft);
+				lines[lines.length - 1] = lines[lines.length - 1].substr(0, offset) + this.cursor + lines[lines.length - 1].substr(offset);
+
+				prev.innerHTML = lines.join('<br>');
+				this.elementWithCursor = prev;
+			}
+		}
 	}
 
 	moveDown() {
@@ -168,13 +198,30 @@ class Cursor {
 		}
 	}
 
-	_get_line_height(element) {
-		let clone = element.cloneNode();
-		clone.innerHTML = 'a';
+	_findCharOffset(context, string, pixelOffset) {
+		let clone = context.cloneNode(false);
+		clone.style.display = "inline-block";
 		this.editor.appendChild(clone);
-		let line_height = clone.clientHeight;
-		this.editor.removeChild(clone);
 
-		return line_height;
+		let width = undefined;
+		let offset = 0;
+		while (offset <= string.length) {
+			offset++;
+			clone.innerHTML = string.substr(0, offset);
+
+			if (clone.clientWidth > pixelOffset) {
+				width = clone.clientWidth;
+				break;
+			}
+		}
+		clone.innerHTML = string.substr(0, offset - 1);
+		let widthMinus1 = clone.clientWidth;
+
+		if (pixelOffset - widthMinus1 < width - pixelOffset) {
+			offset--;
+		}
+
+		this.editor.removeChild(clone);
+		return offset;
 	}
 }
