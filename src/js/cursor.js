@@ -2,8 +2,6 @@ class Cursor {
 	constructor(editor) {
 		this.editor = editor;
 		this.elementWithCursor = undefined;
-		this.offset = undefined; // Offset in the element as plain text
-
 		this.cursor = '<cursor></cursor>';
 	}
 
@@ -21,7 +19,6 @@ class Cursor {
 
 		// -1 means the greatest offset possible
 		if (offset === -1) {
-			this.offset = element.innerHTML.length;
 			element.innerHTML += this.cursor;
 		} else {
 			// Find where to put it
@@ -94,21 +91,21 @@ class Cursor {
 	}
 
 	insertAtCursor(string) {
-		if (string !== '\n') {
-			console.log(string.length);
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset) + string + this.elementWithCursor.innerHTML.substr(this.offset);
-			this.offset += string.length;
+		let match = new RegExp(this.cursor).exec(this.elementWithCursor.innerHTML);
 
-			if (this.offset < 5) {
+		if (string !== '\n') {
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index) + string + this.elementWithCursor.innerHTML.substr(match.index);
+
+			if (match.index < 5) {
 				this._revaluate_element_class(this.elementWithCursor);
 			}
 
 		} else {
 			let span = document.createElement('span');
 			span.classList.add('paragraph');
-			span.innerHTML = this.elementWithCursor.innerHTML.substr(this.offset);
+			span.innerHTML = this.elementWithCursor.innerHTML.substr(match.index);
 
-			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset);
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index);
 
 			if (this.elementWithCursor.nextElementSibling) {
 				this.editor.insertBefore(span, this.elementWithCursor.nextElementSibling);
@@ -120,23 +117,25 @@ class Cursor {
 			this._revaluate_element_class(span);
 
 			this.elementWithCursor = span;
-			this.offset = 0;
 		}
 	}
 
 	deleteAtCursor() {
-		if (this.offset !== 0) {
-			/*this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset - 1) + this.elementWithCursor.innerHTML.substr(this.offset);
-			this.offset--;
+		let match = new RegExp(this.cursor).exec(this.elementWithCursor.innerHTML);
 
-			if (this.offset < 5) {
+		if (match.index !== 0) {
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, match.index - 1) + this.elementWithCursor.innerHTML.substr(match.index);
+
+			if (match.index < 5) {
 				this._revaluate_element_class(this.elementWithCursor);
-			}*/
+			}
 		} else {
-			/*this.moveLeft();
-			this.elementWithCursor.innerHTML += this.elementWithCursor.nextElementSibling.innerHTML;
-			this.editor.removeChild(this.elementWithCursor.nextElementSibling);
-			this._revaluate_element_class(this.elementWithCursor);*/
+			if (this.elementWithCursor.previousElementSibling) {
+				this.moveLeft();
+				this.elementWithCursor.innerHTML += this.elementWithCursor.nextElementSibling.innerHTML;
+				this.editor.removeChild(this.elementWithCursor.nextElementSibling);
+				this._revaluate_element_class(this.elementWithCursor);
+			}
 		}
 	}
 
@@ -148,12 +147,9 @@ class Cursor {
 		cursor.parentNode.replaceChild(cln, cursor);
 	}
 
-	_putCursorOnText() {
-		this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset) + this.cursor + this.elementWithCursor.innerHTML.substr(this.offset);
-	}
-
 	_revaluate_element_class(element) {
-		let text = this._as_plain_text(element.innerHTML);
+		let text = element.innerHTML.replace(this.cursor, '');
+		console.log(text);
 
 		if (text[0] === '#') {
 			let i = 0;
