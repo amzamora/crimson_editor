@@ -31,47 +31,53 @@ class Cursor {
 	}
 
 	moveLeft() {
-		this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace(this.cursor, '');
+		let match = new RegExp(this.cursor).exec(this.elementWithCursor.innerHTML);
 
 		// If not at the start of element
-		if (this.offset > 0) {
-			this.offset--;
-			if (this.elementWithCursor.innerHTML[this.offset] === '>') {
-				while(this.elementWithCursor.innerHTML[this.offset] !== '<') {
-					this.offset--;
+		if (match.index > 0) {
+			let aux = match.index - 1;
+			if (this.elementWithCursor.innerHTML[aux] === '>') {
+				while(this.elementWithCursor.innerHTML[aux] !== '<') {
+					aux--;
 				}
 			}
+
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace(this.cursor, '');
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, aux) + this.cursor + this.elementWithCursor.innerHTML.substr(aux);
 
 		} else {
 			if (this.elementWithCursor.previousElementSibling) {
+				this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace(this.cursor, '');
 				this.elementWithCursor = this.elementWithCursor.previousElementSibling;
-				this.offset = this.elementWithCursor.innerHTML.length;
+				this.elementWithCursor.innerHTML += this.cursor;
 			}
 		}
-
-		this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset) + this.cursor + this.elementWithCursor.innerHTML.substr(this.offset);
 	}
 
 	moveRight() {
+		let match = new RegExp(this.cursor).exec(this.elementWithCursor.innerHTML);
 		this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.replace(this.cursor, '');
 
 		// At the end of element
-		if (this.offset < this.elementWithCursor.innerHTML.length) {
-			if (this.elementWithCursor.innerHTML[this.offset] === '<') {
-				while(this.elementWithCursor.innerHTML[this.offset] !== '>') {
-					this.offset++;
+		if (match.index < this.elementWithCursor.innerHTML.length) {
+			let aux = match.index;
+			if (this.elementWithCursor.innerHTML[aux] === '<') {
+				while(this.elementWithCursor.innerHTML[aux] !== '>') {
+					aux++;
 				}
 			}
-			this.offset++;
+			aux++;
+
+			this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, aux) + this.cursor + this.elementWithCursor.innerHTML.substr(aux);
 
 		} else {
 			if (this.elementWithCursor.nextElementSibling) {
 				this.elementWithCursor = this.elementWithCursor.nextElementSibling;
-				this.offset = 0;
+				this.elementWithCursor.innerHTML = this.cursor + this.elementWithCursor.innerHTML;
+			} else {
+				this.elementWithCursor.innerHTML += this.cursor;
 			}
 		}
-
-		this.elementWithCursor.innerHTML = this.elementWithCursor.innerHTML.substr(0, this.offset) + this.cursor + this.elementWithCursor.innerHTML.substr(this.offset);
 	}
 
 	moveUp() {

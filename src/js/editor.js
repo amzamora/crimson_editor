@@ -16,7 +16,8 @@ class TypoEditor {
 			self._onClick(e);
 		});
 		window.addEventListener('resize', function(e) {
-			for (let child of self.editor.children) {
+			for (let child of self.him.children) {
+				child.innerHTML = child.innerHTML.replace(/<br>/g, ' ');
 				self._wrapText(child);
 			}
 		});
