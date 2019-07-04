@@ -220,7 +220,6 @@ class Cursor {
 
 	_revaluate_element_class(element) {
 		let text = element.innerHTML.replace(this.cursor, '');
-		console.log(text);
 
 		if (text[0] === '#') {
 			let i = 0;
