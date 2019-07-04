@@ -17,7 +17,6 @@ class TypoEditor {
 		});
 		window.addEventListener('resize', function(e) {
 			for (let child of self.him.children) {
-				child.innerHTML = child.innerHTML.replace(/<br>/g, ' ');
 				self._wrapText(child);
 			}
 		});
@@ -50,6 +49,8 @@ class TypoEditor {
 	   ======= */
 
 	_wrapText(element) {
+		element.innerHTML = element.innerHTML.replace(/<br>/g, ' ');
+
 		let clone = element.cloneNode(false);
 		clone.style.display = "inline-block";
 		this.him.appendChild(clone);
@@ -60,8 +61,7 @@ class TypoEditor {
 			if (word.length === 0) {
 				clone.innerHTML += ' ';
 			} else {
-				clone.innerHTML += ' ';
-				clone.innerHTML += word;
+				clone.innerHTML += ' ' + word;
 			}
 
 			if (element.clientWidth < clone.clientWidth) {
