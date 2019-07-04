@@ -50,6 +50,8 @@ class Cursor {
 				this.elementWithCursor.innerHTML += this.cursor;
 			}
 		}
+
+		this.offset = -1;
 	}
 
 	moveRight() {
@@ -76,11 +78,15 @@ class Cursor {
 				this.elementWithCursor.innerHTML += this.cursor;
 			}
 		}
+
+		this.offset = -1;
 	}
 
 	moveUp() {
 		// Get horizontal offset of cursor on pixels
-		let pixelOffset = this.elementWithCursor.getElementsByTagName('cursor')[0].offsetLeft;
+		if (this.offset === -1) {
+ 			this.offset = this.elementWithCursor.getElementsByTagName('cursor')[0].offsetLeft;
+		}
 
 		// Find line with cursor
 		let line = 0;
@@ -95,7 +101,7 @@ class Cursor {
 		// Realocate cursor
 		if (line !== 0) {
 			lines[line] = lines[line].replace(this.cursor, '');
-			let offset = this._findCharOffset(this.elementWithCursor, lines[line - 1], pixelOffset - this.elementWithCursor.offsetLeft);
+			let offset = this._findCharOffset(this.elementWithCursor, lines[line - 1], this.offset - this.elementWithCursor.offsetLeft);
 			lines[line - 1] = lines[line - 1].substr(0, offset) + this.cursor + lines[line - 1].substr(offset);
 
 			this.elementWithCursor.innerHTML = lines.join('<br>');
@@ -107,7 +113,7 @@ class Cursor {
 				let prev = this.elementWithCursor.previousElementSibling;
 
 				lines = prev.innerHTML.split('<br>');
-				let offset = this._findCharOffset(prev, lines[lines.length - 1], pixelOffset - this.elementWithCursor.offsetLeft);
+				let offset = this._findCharOffset(prev, lines[lines.length - 1], this.offset - this.elementWithCursor.offsetLeft);
 				lines[lines.length - 1] = lines[lines.length - 1].substr(0, offset) + this.cursor + lines[lines.length - 1].substr(offset);
 
 				prev.innerHTML = lines.join('<br>');
@@ -117,7 +123,42 @@ class Cursor {
 	}
 
 	moveDown() {
+		// Get horizontal offset of cursor on pixels
+		if (this.offset === -1) {
+			this.offset = this.elementWithCursor.getElementsByTagName('cursor')[0].offsetLeft;
+		}
 
+		// Find line with cursor
+		let line = 0;
+		let lines = this.elementWithCursor.innerHTML.split('<br>');
+		for (let aux of lines) {
+			if (aux.includes(this.cursor)) {
+				break;
+			}
+			line++;
+		}
+
+		if (line !== lines.length - 1) {
+			lines[line] = lines[line].replace(this.cursor, '');
+			let offset = this._findCharOffset(this.elementWithCursor, lines[line + 1], this.offset - this.elementWithCursor.offsetLeft);
+			lines[line + 1] = lines[line + 1].substr(0, offset) + this.cursor + lines[line + 1].substr(offset);
+
+			this.elementWithCursor.innerHTML = lines.join('<br>');
+		} else {
+			if (this.elementWithCursor.nextElementSibling) {
+				lines[line] = lines[line].replace(this.cursor, '');
+				this.elementWithCursor.innerHTML = lines.join('<br>');
+
+				let next = this.elementWithCursor.nextElementSibling;
+
+				lines = next.innerHTML.split('<br>');
+				let offset = this._findCharOffset(next, lines[0], this.offset - this.elementWithCursor.offsetLeft);
+				lines[0] = lines[0].substr(0, offset) + this.cursor + lines[0].substr(offset);
+
+				next.innerHTML = lines.join('<br>');
+				this.elementWithCursor = next;
+			}
+		}
 	}
 
 	insertAtCursor(string) {

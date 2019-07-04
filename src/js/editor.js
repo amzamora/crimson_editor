@@ -98,6 +98,10 @@ class TypoEditor {
 				this.cursor.moveUp();
 				break;
 
+			case 'down-key':
+				this.cursor.moveDown();
+				break;
+
 			case 'deletion':
 				this.cursor.deleteAtCursor();
 				break;
