@@ -3,7 +3,7 @@ class Cursor {
 		this.editor = editor;
 		this.elementWithCursor = undefined;
 		this.cursor = '<cursor></cursor>';
-		this.pixel_offset = -1;
+		this.pixelOffset = -1;
 	}
 
 	setPosition(element = -1, offset = -1) {
@@ -51,7 +51,7 @@ class Cursor {
 			}
 		}
 
-		this.offset = -1;
+		this.pixelOffset = -1;
 	}
 
 	moveRight() {
@@ -79,13 +79,13 @@ class Cursor {
 			}
 		}
 
-		this.offset = -1;
+		this.pixelOffset = -1;
 	}
 
 	moveUp() {
 		// Get horizontal offset of cursor on pixels
-		if (this.offset === -1) {
- 			this.offset = this.elementWithCursor.getElementsByTagName('cursor')[0].offsetLeft;
+		if (this.pixelOffset === -1) {
+ 			this.pixelOffset = this.elementWithCursor.getElementsByTagName('cursor')[0].offsetLeft;
 		}
 
 		// Find line with cursor
@@ -101,7 +101,7 @@ class Cursor {
 		// Realocate cursor
 		if (line !== 0) {
 			lines[line] = lines[line].replace(this.cursor, '');
-			let offset = this._findCharOffset(this.elementWithCursor, lines[line - 1], this.offset - this.elementWithCursor.offsetLeft);
+			let offset = this._findCharOffset(this.elementWithCursor, lines[line - 1], this.pixelOffset - this.elementWithCursor.offsetLeft);
 			lines[line - 1] = lines[line - 1].substr(0, offset) + this.cursor + lines[line - 1].substr(offset);
 
 			this.elementWithCursor.innerHTML = lines.join('<br>');
@@ -113,7 +113,7 @@ class Cursor {
 				let prev = this.elementWithCursor.previousElementSibling;
 
 				lines = prev.innerHTML.split('<br>');
-				let offset = this._findCharOffset(prev, lines[lines.length - 1], this.offset - this.elementWithCursor.offsetLeft);
+				let offset = this._findCharOffset(prev, lines[lines.length - 1], this.pixelOffset - this.elementWithCursor.offsetLeft);
 				lines[lines.length - 1] = lines[lines.length - 1].substr(0, offset) + this.cursor + lines[lines.length - 1].substr(offset);
 
 				prev.innerHTML = lines.join('<br>');
@@ -124,8 +124,8 @@ class Cursor {
 
 	moveDown() {
 		// Get horizontal offset of cursor on pixels
-		if (this.offset === -1) {
-			this.offset = this.elementWithCursor.getElementsByTagName('cursor')[0].offsetLeft;
+		if (this.pixelOffset === -1) {
+			this.pixelOffset = this.elementWithCursor.getElementsByTagName('cursor')[0].offsetLeft;
 		}
 
 		// Find line with cursor
@@ -140,7 +140,7 @@ class Cursor {
 
 		if (line !== lines.length - 1) {
 			lines[line] = lines[line].replace(this.cursor, '');
-			let offset = this._findCharOffset(this.elementWithCursor, lines[line + 1], this.offset - this.elementWithCursor.offsetLeft);
+			let offset = this._findCharOffset(this.elementWithCursor, lines[line + 1], this.pixelOffset - this.elementWithCursor.offsetLeft);
 			lines[line + 1] = lines[line + 1].substr(0, offset) + this.cursor + lines[line + 1].substr(offset);
 
 			this.elementWithCursor.innerHTML = lines.join('<br>');
@@ -152,7 +152,7 @@ class Cursor {
 				let next = this.elementWithCursor.nextElementSibling;
 
 				lines = next.innerHTML.split('<br>');
-				let offset = this._findCharOffset(next, lines[0], this.offset - this.elementWithCursor.offsetLeft);
+				let offset = this._findCharOffset(next, lines[0], this.pixelOffset - this.elementWithCursor.offsetLeft);
 				lines[0] = lines[0].substr(0, offset) + this.cursor + lines[0].substr(offset);
 
 				next.innerHTML = lines.join('<br>');
