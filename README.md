@@ -30,15 +30,17 @@ The element class is the base behaviour for manipulation for most writedown elem
 
 ### Cursor navigation
 - [ ] Add clickling as a way to move the cursor
-- [ ] Add up arrow and down arrow as ways to move the cursor
+- [x] Add up arrow and down arrow as ways to move the cursor
+
+### Elements
+- [ ] Lists
+- [ ] Blockquotes
+- [ ] Code
+- [ ] Inline elements
 
 ### Edition
 - [ ] Selection
   - [ ] Deletion
   - [ ] Copy
+- [ ] Undo, Redo
 - [ ] Image insertion
-
-### Elements
-- [ ] Unordered lists
-- [ ] Ordered lists
-- [ ] Inline elements
