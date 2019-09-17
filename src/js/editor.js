@@ -20,8 +20,7 @@ class TypoEditor {
 	setText(text) {
 		this.him.innerHTML = '';
 		Parser.put_text_on_editor(text, this.him);
-
-		//this.cursor.setPosition(); // setPosition(element, offset);
+		this.cursor.putOnEditor();
 	}
 
 	setFontSize(new_size) {

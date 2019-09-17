@@ -37,29 +37,28 @@ class Parser {
 	}
 
 	static _get_header() {
-		let span = document.createElement('span');
-
 		// Determine what type of header it is
 		let i = 0;
 		while (this.text[this.index + i] === '#') {
 			i++;
 		}
-		span.classList.add(`h${i}`);
+
+		// Create header element
+		let header = document.createElement(`h${i}`);
 
 		// Get header content
 		while (this.text[this.index] !== '\n' && this.index < this.text.length) {
-			span.innerHTML += this.text[this.index];
+			header.innerHTML += this.text[this.index];
 			this.index++;
 		}
 
-		return span;
+		return header;
 	}
 
 	static _get_paragraph() {
-		let span = document.createElement('span');
-		span.classList.add('paragraph');
+		let paragraph = document.createElement('p');
 
-		// Get header paragraph
+		// Get paragraph content
 		while( this.index < this.text.length) {
 			if (this.text[this.index] === '\n') {
 				if (this._is_new_element()) {
@@ -68,15 +67,15 @@ class Parser {
 
 				this.index++;
 				if (this.text[this.index] !== ' ') {
-					span.innerHTML += ' ';
+					paragraph.innerHTML += ' ';
 				}
 			}
 
-			span.innerHTML += this.text[this.index];
+			paragraph.innerHTML += this.text[this.index];
 			this.index++;
 		}
 
-		return span;
+		return paragraph;
 	}
 
 	// This function is meant to be called on a new line
