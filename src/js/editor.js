@@ -15,22 +15,13 @@ class TypoEditor {
 		this.him.addEventListener('click', function(e) {
 			self._onClick(e);
 		});
-		window.addEventListener('resize', function(e) {
-			for (let child of self.him.children) {
-				self._wrapText(child);
-			}
-		});
 	}
 
 	setText(text) {
 		this.him.innerHTML = '';
 		Parser.put_text_on_editor(text, this.him);
 
-		for (let child of this.him.children) {
-			this._wrapText(child);
-		}
-
-		this.cursor.setPosition(); // setPosition(element, offset);
+		//this.cursor.setPosition(); // setPosition(element, offset);
 	}
 
 	setFontSize(new_size) {
@@ -43,42 +34,6 @@ class TypoEditor {
 			text += child.innerHTML;
 		}
 		return text;
-	}
-
-	/* Private
-	   ======= */
-
-	_wrapText(element) {
-		element.innerHTML = element.innerHTML.replace(/<br>/g, ' ');
-
-		let clone = element.cloneNode(false);
-		clone.style.display = "inline-block";
-		this.him.appendChild(clone);
-
-		let words = element.innerHTML.split(' ');
-		clone.innerHTML += words.shift();
-		for (let word of words) {
-			if (word.length === 0) {
-				clone.innerHTML += ' ';
-			} else {
-				clone.innerHTML += ' ' + word;
-			}
-
-			if (element.clientWidth < clone.clientWidth) {
-				// Find previos inserted ' ' and replace it with <br>
-				let i = clone.innerHTML.length;
-				while (i > 0) {
-					if (clone.innerHTML[i] === ' ') {
-						clone.innerHTML = clone.innerHTML.substr(0, i) + '<br>' + clone.innerHTML.substr(i + 1);
-						break;
-					}
-					i--;
-				}
-			}
-		}
-
-		element.innerHTML = clone.innerHTML;
-		this.him.removeChild(clone);
 	}
 
 	/* Callbacks
@@ -113,8 +68,6 @@ class TypoEditor {
 			default:
 				if (e.value.length === 1) {
 					this.cursor.insertAtCursor(e.value);
-					this.cursor.elementWithCursor.innerHTML = this.cursor.elementWithCursor.innerHTML.replace(/<br>/g, ' ');
-					this._wrapText(this.cursor.elementWithCursor);
 				}
 				break;
 		}

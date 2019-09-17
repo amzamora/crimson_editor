@@ -3,6 +3,7 @@
 
 .CrimsonEditor {
 	position: relative;
+	overflow: auto;
 }
 
 cursor {
