@@ -19,7 +19,7 @@ class NotebooksEditor {
 
 	setText(text) {
 		this.buffer.setText(text);
-		this.him.innerHTML = this.buffer.getText();
+		this._update();
 	}
 
 	setFontSize(new_size) {
@@ -34,29 +34,38 @@ class NotebooksEditor {
 		return text;
 	}
 
-	/* Callbacks
-	   ========= */
+	// Private
+	// =======
+
+	_update() {
+		this.him.innerHTML = this.buffer.getText();
+		this._drawCursor();
+	}
+
+	_drawCursor() {
+		this.him.innerHTML = this.him.innerHTML.substr(0, this.buffer.cursor) + '<cursor>' + this.him.innerHTML.substr(this.buffer.cursor);
+	}
+
+	// Callbacks
+	// =========
 
 	_onKeyboardInput(e) {
 		switch (e.value) {
 			case 'left-key':
-				this.cursor.moveLeft();
+				this.buffer.cursor--;
 				break;
 
 			case 'right-key':
-				this.cursor.moveRight();
+				this.buffer.cursor++;
 				break;
 
 			case 'up-key':
-				this.cursor.moveUp();
 				break;
 
 			case 'down-key':
-				this.cursor.moveDown();
 				break;
 
 			case 'deletion':
-				this.cursor.deleteAtCursor();
 				break;
 
 			default:
@@ -66,7 +75,7 @@ class NotebooksEditor {
 				break;
 		}
 
-		this.him.innerHTML = this.buffer.getText();
+		this._update();
 	}
 
 	_onClick(e) {
