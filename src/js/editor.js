@@ -1,8 +1,8 @@
-class TypoEditor {
+class NotebooksEditor {
 	constructor (anchor) {
 		// Initialize editor
 		this.him = document.getElementById(anchor);
-		this.him.classList.add('CrimsonEditor');
+		this.him.classList.add('NotebooksEditor');
 		this.him.innerHTML = '';
 		this.buffer = new Buffer();
 
@@ -78,7 +78,7 @@ class TypoEditor {
 function Input(editor) {
 	let input = document.createElement('input');
 	input.setAttribute('type', 'text');
-	input.classList.add('crimson-editor-input');
+	input.classList.add('notebooks-editor-input');
 	editor.parentElement.appendChild (input);
 
 	// Listen for keypresses
