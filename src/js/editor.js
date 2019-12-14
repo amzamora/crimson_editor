@@ -4,7 +4,7 @@ class TypoEditor {
 		this.him = document.getElementById(anchor);
 		this.him.classList.add('CrimsonEditor');
 		this.him.innerHTML = '';
-		this.cursor = new Cursor(this.him);
+		this.buffer = new Buffer();
 
 		// Attach callbacks to manage input
 		this.input = Input(this.him);
@@ -18,9 +18,8 @@ class TypoEditor {
 	}
 
 	setText(text) {
-		this.him.innerHTML = '';
-		Parser.put_text_on_editor(text, this.him);
-		this.cursor.putOnEditor();
+		this.buffer.setText(text);
+		this.him.innerHTML = this.buffer.getText();
 	}
 
 	setFontSize(new_size) {
@@ -60,30 +59,29 @@ class TypoEditor {
 				this.cursor.deleteAtCursor();
 				break;
 
-			case 'new-line':
-				this.cursor.insertAtCursor('\n');
-				break;
-
 			default:
 				if (e.value.length === 1) {
-					this.cursor.insertAtCursor(e.value);
+					this.buffer.insertAtCursor(e.value);
 				}
 				break;
 		}
+
+		this.him.innerHTML = this.buffer.getText();
 	}
 
 	_onClick(e) {
-		this.input.focus ();
+		this.input.focus();
 	}
 }
 
-// TO DO: Explain this
+// Generates an input box on the editor
 function Input(editor) {
 	let input = document.createElement('input');
 	input.setAttribute('type', 'text');
 	input.classList.add('crimson-editor-input');
 	editor.parentElement.appendChild (input);
 
+	// Listen for keypresses
 	document.addEventListener('keydown', function(e) {
 		if (input === document.activeElement) {
 			let aux = new CustomEvent('keyboard-input');
@@ -109,20 +107,22 @@ function Input(editor) {
 				input.dispatchEvent(aux);
 
 			} else if (e.keyCode == 13) {
-				aux.value = 'new-line';
+				aux.value = '\n';
 				input.dispatchEvent(aux);
 
 			}
 		}
 	});
 
+	// Listen for input
 	input.addEventListener('input', function (e) {
 			let aux = new CustomEvent('keyboard-input');
-			aux.type = 'input';
 			aux.value = input.value;
 
+			// Reset input box
 			input.value = '';
 
+			// Check for deleteContentBackward
 			if (e.inputType !== 'deleteContentBackward') {
 				input.dispatchEvent(aux);
 			}
