@@ -5,6 +5,7 @@ class NotebooksEditor {
 		this.him.classList.add('NotebooksEditor');
 		this.him.innerHTML = '';
 		this.buffer = new Buffer();
+		this.cursor = 0;
 
 		// Attach callbacks to manage input
 		this.input = Input(this.him);
@@ -17,8 +18,13 @@ class NotebooksEditor {
 		});
 	}
 
-	setText(text) {
+	setText(text, cursor = -1) {
 		this.buffer.setText(text);
+		if (cursor !== - 1) {
+			this.cursor = cursor;
+		} else {
+			this.cursor = text.length;
+		}
 		this._update();
 	}
 
@@ -40,10 +46,12 @@ class NotebooksEditor {
 	_update() {
 		this.him.innerHTML = this.buffer.getText();
 		this._drawCursor();
+		this.him.innerHTML = Parser.stylize(this.him.innerHTML);
 	}
 
 	_drawCursor() {
-		this.him.innerHTML = this.him.innerHTML.substr(0, this.buffer.cursor) + '<cursor>' + this.him.innerHTML.substr(this.buffer.cursor);
+		console.log(this.him.innerHTML.substr(0, this.cursor) + '<cursor>' + this.him.innerHTML.substr(this.cursor));
+		this.him.innerHTML = this.him.innerHTML.substr(0, this.cursor) + '|' + this.him.innerHTML.substr(this.cursor);
 	}
 
 	// Callbacks
@@ -52,11 +60,11 @@ class NotebooksEditor {
 	_onKeyboardInput(e) {
 		switch (e.value) {
 			case 'left-key':
-				this.buffer.cursor--;
+				this.cursor--;
 				break;
 
 			case 'right-key':
-				this.buffer.cursor++;
+				this.cursor++;
 				break;
 
 			case 'up-key':

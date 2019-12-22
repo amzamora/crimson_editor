@@ -12,62 +12,13 @@ class Piece {
 }
 
 class Buffer {
-	constructor(text = "", cursor = 0) {
+	constructor(text = "") {
 		this._original = text;
 		this._added = "";
-		this.cursor = cursor;
 		this._pieces = [];
 	}
 
-	insertAtCursor(text) {
-		this._insertAt(this.cursor, text);
-		this.cursor += text.length;
-	}
-
-	delete() {
-
-	}
-
-	undo() {
-
-	}
-
-	redo() {
-
-	}
-
-	getText() {
-		let text = "";
-		for (let piece of this._pieces) {
-			if (piece.type === Text.ORIGINAL) {
-				text += this._original.substr(piece.start, piece.length);
-			} else {
-				text += this._added.substr(piece.start, piece.length);
-			}
-		}
-
-		return text;
-	}
-
-	setText(text, cursor = -1) {
-		let newPiece = new Piece(Text.ORIGINAL, 0, text.length);
-		this._original = text;
-		this._pieces.push(newPiece);
-
-		if (cursor > text.length) {
-			throw new Error("The cursor provided in setText() is invalid.");
-		} else if (cursor === -1){
-			this.cursor = text.length;
-		} else {
-			this.cursor = cursor;
-		}
-	}
-
-	// Private
-	// -------
-
-	// Insert some text at offset
-	_insertAt(offset, text) {
+	insertAt(offset, text) {
 		if (offset < 0 || offset > this.getText().length) {
 			throw new Error("Offset provided in _insertAt() is invalid.")
 		}
@@ -114,12 +65,48 @@ class Buffer {
 				}
 			}
 
+		// If there are no pieces
 		} else {
 			let newPiece = new Piece(Text.ADDED, this._added.length, text.length);
 			this._added += text;
 			this._pieces.push(newPiece);
 		}
 	}
+
+
+	delete() {
+
+	}
+
+	undo() {
+
+	}
+
+	redo() {
+
+	}
+
+	getText() {
+		let text = "";
+		for (let piece of this._pieces) {
+			if (piece.type === Text.ORIGINAL) {
+				text += this._original.substr(piece.start, piece.length);
+			} else {
+				text += this._added.substr(piece.start, piece.length);
+			}
+		}
+
+		return text;
+	}
+
+	setText(text) {
+		let newPiece = new Piece(Text.ORIGINAL, 0, text.length);
+		this._original = text;
+		this._pieces.push(newPiece);
+	}
+
+	// Private
+	// -------
 
 	// Returns a piece with some extra info on it
 	_getPieceOnOffset(offset) {
