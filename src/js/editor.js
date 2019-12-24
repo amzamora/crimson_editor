@@ -5,7 +5,6 @@ class NotebooksEditor {
 		this.him.classList.add('NotebooksEditor');
 		this.him.innerHTML = '';
 		this.buffer = new Buffer();
-		this.cursor = 0;
 
 		// Attach callbacks to manage input
 		this.input = Input(this.him);
@@ -21,9 +20,9 @@ class NotebooksEditor {
 	setText(text, cursor = -1) {
 		this.buffer.setText(text);
 		if (cursor !== - 1) {
-			this.cursor = cursor;
+			this.cursor = new Cursor(cursor);
 		} else {
-			this.cursor = text.length;
+			this.cursor = new Cursor(text.length);
 		}
 		this._update();
 	}
@@ -33,11 +32,7 @@ class NotebooksEditor {
 	}
 
 	getText() {
-		let text = "";
-		for (let child of this.him.childNodes) {
-			text += child.innerHTML;
-		}
-		return text;
+
 	}
 
 	// Private
@@ -45,13 +40,7 @@ class NotebooksEditor {
 
 	_update() {
 		this.him.innerHTML = this.buffer.getText();
-		this._drawCursor();
-		this.him.innerHTML = Parser.stylize(this.him.innerHTML);
-	}
-
-	_drawCursor() {
-		console.log(this.him.innerHTML.substr(0, this.cursor) + '<cursor>' + this.him.innerHTML.substr(this.cursor));
-		this.him.innerHTML = this.him.innerHTML.substr(0, this.cursor) + '|' + this.him.innerHTML.substr(this.cursor);
+		this.cursor.draw(this.him);
 	}
 
 	// Callbacks
@@ -60,11 +49,11 @@ class NotebooksEditor {
 	_onKeyboardInput(e) {
 		switch (e.value) {
 			case 'left-key':
-				this.cursor--;
+				this.cursor.moveLeft(this.buffer);
 				break;
 
 			case 'right-key':
-				this.cursor++;
+				this.cursor.moveRight(this.buffer);
 				break;
 
 			case 'up-key':
@@ -78,7 +67,8 @@ class NotebooksEditor {
 
 			default:
 				if (e.value.length === 1) {
-					this.buffer.insertAtCursor(e.value);
+					this.buffer.insertAt(this.cursor.offset, e.value);
+					this.cursor.moveRight(this.buffer);
 				}
 				break;
 		}
@@ -126,7 +116,6 @@ function Input(editor) {
 			} else if (e.keyCode == 13) {
 				aux.value = '\n';
 				input.dispatchEvent(aux);
-
 			}
 		}
 	});

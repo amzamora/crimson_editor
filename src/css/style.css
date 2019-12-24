@@ -4,9 +4,10 @@
 .NotebooksEditor {
 	position: relative;
 	overflow: auto;
+	white-space: pre-wrap;
 }
 
-cursor {
+.cursor {
 	height: 1.2em;
 	border-left: 1px solid transparent; /* Why it does not work without it?*/
 	position: absolute;
