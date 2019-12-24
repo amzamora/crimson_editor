@@ -74,16 +74,8 @@ class Buffer {
 	}
 
 
-	delete() {
-
-	}
-
-	undo() {
-
-	}
-
-	redo() {
-
+	deleteAt(offset, length) {
+		
 	}
 
 	getText() {
