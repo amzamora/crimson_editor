@@ -24,7 +24,12 @@ class NotebooksEditor {
 		} else {
 			this.cursor = new Cursor(text.length);
 		}
-		this._update();
+
+		this._update(); // This is necessary
+		let self = this; // This is also necessary
+		setTimeout(function() {
+			self._update();
+		}, 50);
 	}
 
 	setFontSize(new_size) {
