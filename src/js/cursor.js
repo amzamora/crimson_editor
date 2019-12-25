@@ -8,7 +8,11 @@ function makeCounter() {
 count = makeCounter();
 
 class Cursor {
-        constructor(offset) {
+        constructor(offset, buffer) {
+                if (offset < 0 || offset > buffer.length()) {
+                        throw new Error("Initial offset for cursor is invalid.");
+                }
+
                 this.offset = offset;
                 this.number = count();
         }
@@ -20,7 +24,7 @@ class Cursor {
         }
 
         moveRight(buffer) {
-                if (this.offset < buffer.getText().length) {
+                if (this.offset < buffer.length()) {
                         this.offset += 1;
                 }
         }
@@ -37,7 +41,7 @@ class Cursor {
                 // Find position of cursor
                 // -----------------------
 
-                // if cursor is in middle of a word
+                // All this is to avoid breaking words where they shouldn't
                 function isWhiteSpace(char) {return char === ' ' || char === '\n'}
 
                 let aux1 = this.offset - 1;

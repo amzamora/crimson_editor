@@ -20,9 +20,9 @@ class NotebooksEditor {
 	setText(text, cursor = -1) {
 		this.buffer.setText(text);
 		if (cursor !== - 1) {
-			this.cursor = new Cursor(cursor);
+			this.cursor = new Cursor(cursor, this.buffer);
 		} else {
-			this.cursor = new Cursor(text.length);
+			this.cursor = new Cursor(text.length, this.buffer);
 		}
 
 		this._update(); // This is necessary

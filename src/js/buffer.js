@@ -20,7 +20,7 @@ class Buffer {
 
 	insertAt(offset, text) {
 		if (offset < 0 || offset > this.getText().length) {
-			throw new Error("Offset provided in _insertAt() is invalid.")
+			throw new Error("Offset provided in insertAt() is invalid.");
 		}
 
 		if (this._pieces.length !== 0) {
@@ -75,7 +75,14 @@ class Buffer {
 
 
 	deleteAt(offset, length) {
-		
+		if (offset < 0 || offset > this.getText().length) {
+			throw new Error("Offset provided in deleteAt() is invalid.");
+		}
+
+		if (length <= 0 || offset + length > this.length()) {
+			throw new Error("Length provided in deleteAt() is invalid.");
+		}
+
 	}
 
 	getText() {
@@ -95,6 +102,10 @@ class Buffer {
 		let newPiece = new Piece(Text.ORIGINAL, 0, text.length);
 		this._original = text;
 		this._pieces.push(newPiece);
+	}
+
+	length() {
+		return this.getText().length;
 	}
 
 	// Private
