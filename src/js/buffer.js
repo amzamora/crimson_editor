@@ -27,6 +27,7 @@ class Buffer {
 			// Get piece affected by insertion
 			let affected = this._getPieceOnOffset(offset);
 
+			// Find what is the offset relative to the piece
 			let relativeOffset = offset - affected.offset;
 
 			// If something is added at start of the piece
@@ -83,6 +84,31 @@ class Buffer {
 			throw new Error("Length provided in deleteAt() is invalid.");
 		}
 
+		// Find first piece affected by deletion
+		let affected = this._getPieceOnOffset(offset);
+
+		// Find what is the offset relative to the piece
+		let relativeOffset = offset - affected[0].offset;
+
+		// Delete pieces until length matched
+		while (length > 0) {
+			// If the length is contained in the piece
+			if (relativeOffset + length <= affected.length) {
+				this._deleteFromPiece(affected.index, relativeOffset, length)
+				length = 0;
+			} else {
+				this._deleteFromPiece(affected.index, relativeOffset, affected.length - relativeOffset);
+				length -= affected.length - relativeOffset;
+			}
+		}
+
+		// Delete pieces with length 0
+		while (this._pieces[affected.index].length === 0) {
+			this._pieces.splice(affected.index, 1);
+			if (affected.index === this._pieces.length) {
+				break;
+			}
+		}
 	}
 
 	getText() {
@@ -108,10 +134,18 @@ class Buffer {
 		return this.getText().length;
 	}
 
+	undo() {
+
+	}
+
+	redo() {
+
+	}
+
 	// Private
 	// -------
 
-	// Returns a piece with some extra info on it
+	// Returns a piece copy with her offset and index on it
 	_getPieceOnOffset(offset) {
 		let pieceIndex = 0;
 		let pieceOffset = 0;
@@ -127,5 +161,16 @@ class Buffer {
 		}
 
 		return undefined; // That json stuff is to return a copy and not a reference
+	}
+
+	// Delete text from a piece
+	_deleteFromPiece(pieceIndex, offset, length) {
+		if (offset < 0 || offset > this._pieces[pieceIndex].length) {
+			throw new Error("Offset provided in _deleteFromPiece() is invalid.");
+		}
+
+		if (length <= 0 || offset + length > this._pieces[pieceIndex].length) {
+			throw new Error("Length provided in _deleteFromPiece() is invalid.");
+		}
 	}
 }
