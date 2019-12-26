@@ -68,7 +68,7 @@ class Buffer {
 
 		// If there are no pieces
 		} else {
-			let newPiece = new Piece(Text.ADDED, this._added.length, text.length);
+			let newPiece = new Piece(Text.ADDED, 0, text.length);
 			this._added += text;
 			this._pieces.push(newPiece);
 		}
@@ -88,23 +88,32 @@ class Buffer {
 		let affected = this._getPieceOnOffset(offset);
 
 		// Find what is the offset relative to the piece
-		let relativeOffset = offset - affected[0].offset;
+		let relativeOffset = offset - affected.offset;
 
 		// Delete pieces until length matched
+		let i = affected.index;
 		while (length > 0) {
 			// If the length is contained in the piece
-			if (relativeOffset + length <= affected.length) {
-				this._deleteFromPiece(affected.index, relativeOffset, length)
+			if (relativeOffset + length <= this._pieces[i].length) {
+				this._deleteFromPiece(i, relativeOffset, length)
 				length = 0;
 			} else {
-				this._deleteFromPiece(affected.index, relativeOffset, affected.length - relativeOffset);
-				length -= affected.length - relativeOffset;
+				length -= this._pieces[i].length - relativeOffset;
+				this._deleteFromPiece(i, relativeOffset, this._pieces[i].length - relativeOffset);
+				relativeOffset = 0;
+				i += 1;
 			}
 		}
 
 		// Delete pieces with length 0
-		while (this._pieces[affected.index].length === 0) {
+		if (this._pieces[affected.index].length === 0) {
 			this._pieces.splice(affected.index, 1);
+		} else {
+			affected.index += 1;
+		}
+
+		while (this._pieces[affected.index].length === 0) {
+			this._pieces.splice(affected.index, 1); // This removes stuff from this._pieces
 			if (affected.index === this._pieces.length) {
 				break;
 			}
@@ -151,7 +160,7 @@ class Buffer {
 		let pieceOffset = 0;
 		for (let piece of this._pieces) {
 			if (pieceOffset <= offset && offset <= pieceOffset + piece.length) {
-				let copy = JSON.parse(JSON.stringify(piece));
+				let copy = JSON.parse(JSON.stringify(piece)); // That json stuff is to return a copy and not a reference
 				copy.offset = pieceOffset; // Extra info
 				copy.index = pieceIndex;   // Extra info
 				return copy;
@@ -160,7 +169,7 @@ class Buffer {
 			pieceIndex += 1;
 		}
 
-		return undefined; // That json stuff is to return a copy and not a reference
+		return undefined;
 	}
 
 	// Delete text from a piece
@@ -171,6 +180,29 @@ class Buffer {
 
 		if (length <= 0 || offset + length > this._pieces[pieceIndex].length) {
 			throw new Error("Length provided in _deleteFromPiece() is invalid.");
+		}
+
+		// If some segment at the start of the piece is removed (This include if all the piece is deleted)
+		if (offset === 0) {
+			console.log(offset, length);
+			this._pieces[pieceIndex].length -= length;
+			this._pieces[pieceIndex].start += length;
+
+		// If some segment in the middle of the piece is removed
+		} else if (offset + length < this._pieces[pieceIndex].length) {
+			// Create second half
+			let secondHalf = new Piece (this._pieces[pieceIndex].type, this._pieces[pieceIndex].start + offset + length, this._pieces[pieceIndex].length - (offset + length));
+
+			// Create first half
+			this._pieces[pieceIndex].length = offset;
+
+			// Put second half on pieces
+			this._pieces.splice(pieceIndex + 1, 0, secondHalf);
+
+		// If some segment at the end of the piece is remove
+		} else {
+			console.log(offset, length);
+			this._pieces[pieceIndex].length = offset;
 		}
 	}
 }
