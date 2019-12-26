@@ -112,11 +112,8 @@ class Buffer {
 			affected.index += 1;
 		}
 
-		while (this._pieces[affected.index].length === 0) {
+		while (affected.index < this._pieces.length && this._pieces[affected.index].length === 0) {
 			this._pieces.splice(affected.index, 1); // This removes stuff from this._pieces
-			if (affected.index === this._pieces.length) {
-				break;
-			}
 		}
 	}
 
@@ -158,11 +155,14 @@ class Buffer {
 	_getPieceOnOffset(offset) {
 		let pieceIndex = 0;
 		let pieceOffset = 0;
+		console.dir(this._pieces);
 		for (let piece of this._pieces) {
+			console.log(offset, pieceOffset + piece.length);
 			if (pieceOffset <= offset && offset <= pieceOffset + piece.length) {
 				let copy = JSON.parse(JSON.stringify(piece)); // That json stuff is to return a copy and not a reference
 				copy.offset = pieceOffset; // Extra info
 				copy.index = pieceIndex;   // Extra info
+				console.log(copy.index);
 				return copy;
 			}
 			pieceOffset += piece.length;
@@ -201,7 +201,6 @@ class Buffer {
 
 		// If some segment at the end of the piece is remove
 		} else {
-			console.log(offset, length);
 			this._pieces[pieceIndex].length = offset;
 		}
 	}

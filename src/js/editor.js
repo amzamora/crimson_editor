@@ -32,7 +32,7 @@ class NotebooksEditor {
 		let self = this; // This is also necessary
 		setTimeout(function() {
 			self._update();
-		}, 50);
+		}, 100);
 	}
 
 	setFontSize(new_size) {
@@ -71,6 +71,10 @@ class NotebooksEditor {
 				break;
 
 			case 'deletion':
+				if (this.cursor.offset > 0) {
+					this.buffer.deleteAt(this.cursor.offset - 1, 1);
+					this.cursor.moveLeft(this.buffer);
+				}
 				break;
 
 			default:
