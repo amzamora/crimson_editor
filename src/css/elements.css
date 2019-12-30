@@ -1,26 +1,27 @@
-h1,
-h2,
-h3,
-p,
-blockquote {
-  white-space: pre-wrap;
+.h1,
+.h2,
+.h3,
+.p,
+.blockquote {
+	display: block;
+	white-space: pre-wrap;
 }
 
 .h1 {
-  font-weight: bold;
-  font-size: x-large;
+	font-weight: bold;
+	font-size: x-large;
 }
 
 .h2 {
-  font-weight: bold;
-  font-size: large;
+	font-weight: bold;
+	font-size: large;
 }
 
 .h3 {
-  font-weight: bold;
+	font-weight: bold;
 }
 
 .blockquote {
-  padding: 10px;
-  border-left: 2px solid grey;
+	padding: 10px;
+	border-left: 2px solid grey;
 }
