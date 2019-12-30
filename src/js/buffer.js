@@ -155,7 +155,6 @@ class Buffer {
 	_getPieceOnOffset(offset) {
 		let pieceIndex = 0;
 		let pieceOffset = 0;
-		console.dir(this._pieces);
 		for (let piece of this._pieces) {
 			if (pieceOffset <= offset && offset <= pieceOffset + piece.length) {
 				let copy = JSON.parse(JSON.stringify(piece)); // That json stuff is to return a copy and not a reference
