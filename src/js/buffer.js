@@ -85,7 +85,7 @@ class Buffer {
 		}
 
 		// Find first piece affected by deletion
-		let affected = this._getPieceOnOffset(offset);
+		let affected = this._getPieceOnOffset(offset + 1); // is +1 because deletion functions different than insertion
 
 		// Find what is the offset relative to the piece
 		let relativeOffset = offset - affected.offset;
@@ -157,12 +157,10 @@ class Buffer {
 		let pieceOffset = 0;
 		console.dir(this._pieces);
 		for (let piece of this._pieces) {
-			console.log(offset, pieceOffset + piece.length);
 			if (pieceOffset <= offset && offset <= pieceOffset + piece.length) {
 				let copy = JSON.parse(JSON.stringify(piece)); // That json stuff is to return a copy and not a reference
 				copy.offset = pieceOffset; // Extra info
 				copy.index = pieceIndex;   // Extra info
-				console.log(copy.index);
 				return copy;
 			}
 			pieceOffset += piece.length;
@@ -184,7 +182,6 @@ class Buffer {
 
 		// If some segment at the start of the piece is removed (This include if all the piece is deleted)
 		if (offset === 0) {
-			console.log(offset, length);
 			this._pieces[pieceIndex].length -= length;
 			this._pieces[pieceIndex].start += length;
 
