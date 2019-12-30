@@ -62,9 +62,6 @@ class Parser {
 				}
 
 				index.pos += 1;
-				if (text[index.pos] !== ' ') {
-				 	paragraph += ' ';
-				}
 			}
 
 			paragraph += text[index.pos];
