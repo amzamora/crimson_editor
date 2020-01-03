@@ -48,7 +48,6 @@ class NotebooksEditor {
 
 	_update() {
 		this.him.innerHTML = Parser.stylize(this.buffer.getText());
-		console.log(Parser.stylize(this.buffer.getText()));
 		this.cursor.draw(this.him);
 	}
 

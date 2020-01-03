@@ -16,6 +16,9 @@ class Buffer {
 		this._original = text;
 		this._added = "";
 		this._pieces = [];
+
+		let piece = new Piece(Text.ORIGINAL, 0, text.length);
+		this._pieces.push(piece);
 	}
 
 	insertAt(offset, text) {

@@ -40,11 +40,12 @@ class Cursor {
         draw(editor) {
                 // Find position of cursor
                 // -----------------------
+                let offset = Cursor._equivalentOffsetOnHtml(this.offset, editor.innerHTML);
 
                 // All this is to avoid breaking words where they shouldn't
                 function isWhiteSpace(char) {return char === ' ' || char === '\n'}
 
-                let aux1 = this.offset - 1;
+                let aux1 = offset - 1;
                 while (!isWhiteSpace(editor.innerHTML[aux1])) {
                         if (aux1 < 1) {
                                 aux1 = 0;
@@ -54,7 +55,7 @@ class Cursor {
                 }
                 if (aux1 !== 0) {aux1 += 1}
 
-                let aux2 = this.offset;
+                let aux2 = offset;
                 while (!isWhiteSpace(editor.innerHTML[aux2])) {
                         if (aux2 > editor.innerHTML.length) {
                                 aux2 = editor.innerHTML.length;
@@ -63,7 +64,7 @@ class Cursor {
                         aux2 += 1;
                 }
 
-                editor.innerHTML = editor.innerHTML.substr(0, aux1) + '<nobr>' + editor.innerHTML.substring(aux1, this.offset) + '<erase-me class="cursor"></erase-me>' + editor.innerHTML.substring(this.offset, aux2) + '</nobr>' + editor.innerHTML.substr(aux2);
+                editor.innerHTML = editor.innerHTML.substr(0, aux1) + '<nobr>' + editor.innerHTML.substring(aux1, offset) + '<erase-me class="cursor"></erase-me>' + editor.innerHTML.substring(offset, aux2) + '</nobr>' + editor.innerHTML.substr(aux2);
 
                 let eraseMe = document.getElementsByTagName('erase-me')[0];
                 let offsetLeft = eraseMe.offsetLeft;
@@ -79,5 +80,43 @@ class Cursor {
                 let cursor = document.getElementsByTagName(`cursor${this.number}`)[0];
                 cursor.style.left = offsetLeft + 'px';
                 cursor.style.top = offsetTop + 'px';
+        }
+
+        static _equivalentOffsetOnHtml(offset, html) {
+                let state = {
+                        offset: 0,
+                        equivalent: 0,
+                        tagOpened: false
+                }
+
+                while (true) {
+                        // Check end conditions
+                        if (state.equivalent >= html.length) {
+                                break;
+                        }
+
+                        if (state.offset === offset && html[state.equivalent] !== '<' && state.tagOpened !== true) {
+                                break;
+                        }
+
+                        // Advance state
+                        if (html[state.equivalent] === '<') {
+                                state.tagOpened = true;
+                                state.equivalent += 1;
+
+                        } else if (html[state.equivalent] === '>') {
+                                state.tagOpened = false;
+                                state.equivalent += 1;
+
+                        } else if (state.tagOpened === true) {
+                                state.equivalent += 1;
+
+                        } else if (state.tagOpened === false) {
+                                state.offset += 1;
+                                state.equivalent += 1;
+                        }
+                }
+
+                return state.equivalent;
         }
 }
