@@ -42,8 +42,8 @@ class Cursor {
                 // -----------------------
                 let offset = Cursor._equivalentOffsetOnHtml(this.offset, editor.innerHTML);
 
-                // All this is to avoid breaking words where they shouldn't
-                function isWhiteSpace(char) {return char === ' ' || char === '\n'}
+                // All this is to avoid breaking words where they shouldn't (FIX THIS)
+                function isWhiteSpace(char) {return char === ' ' || char === '\n' || char === '<' || char === '>'}
 
                 let aux1 = offset - 1;
                 while (!isWhiteSpace(editor.innerHTML[aux1])) {
