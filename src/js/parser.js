@@ -8,6 +8,8 @@ class Parser {
 			stylized += this._nextElement(text, index);
 		}
 
+		stylized = this._inline_stylize(stylized);
+
 		return stylized;
 	}
 
@@ -79,6 +81,16 @@ class Parser {
 		} else {
 			return false;
 		}
+	}
+
+	static _inline_stylize(stylized) {
+		// Bold text
+		let boldRegex = /\*[^\* \t\n](((?!\n\n)[^\*])*[^\* \t\n])?\*/gm;
+		/*stylized = stylized.replace(boldRegex, function(match) {
+			return '<span class="notation">*</span><span class=\"bold\">' + match.substring(1, match.length - 1) + '</span><span class="notation">*</span>';
+		});*/
+
+		return stylized;
 	}
 
 }

@@ -1,3 +1,4 @@
+/* Block elements */
 .h1,
 .h2,
 .h3,
@@ -24,4 +25,13 @@
 .blockquote {
 	padding: 10px;
 	border-left: 2px solid grey;
+}
+
+/* Inline elements */
+.notation {
+	color: gray;
+}
+
+bold {
+	font-weight: bold;
 }
