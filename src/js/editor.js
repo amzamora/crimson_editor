@@ -47,7 +47,8 @@ class NotebooksEditor {
 	// =======
 
 	_update() {
-		this.him.innerHTML = Parser.stylize(this.buffer.getText());
+		this.him.innerHTML = this.buffer.getText();
+		//this.him.innerHTML = Parser.stylize(this.buffer.getText());
 		this.cursor.draw(this.him);
 	}
 

@@ -48,7 +48,7 @@ class Parser {
 			index.pos += 1;
 		}
 
-		header += '</span>';
+		header += '\n</span>';
 
 		return header;
 	}
