@@ -21,6 +21,7 @@ class NotebooksEditor {
 	}
 
 	setText(text, cursor = -1) {
+		text = Parser.format(text);
 		this.buffer.setText(text);
 		if (cursor !== - 1) {
 			this.cursor = new Cursor(cursor, this.buffer);
@@ -29,17 +30,13 @@ class NotebooksEditor {
 		}
 
 		this._update(); // This is necessary
-		let self = this; // This is also necessary
+		let self = this;
 		setTimeout(function() {
-			self._update();
+			self._update(); // This is also necessary
 		}, 100);
 	}
 
 	setFontSize(new_size) {
-
-	}
-
-	getText() {
 
 	}
 
@@ -73,8 +70,14 @@ class NotebooksEditor {
 
 			case 'deletion':
 				if (this.cursor.offset > 0) {
-					this.buffer.deleteAt(this.cursor.offset - 1, 1);
-					this.cursor.moveLeft(this.buffer);
+					if (this.buffer.getText()[this.cursor.offset - 1] !== '\n') {
+						this.buffer.deleteAt(this.cursor.offset - 1, 1);
+						this.cursor.moveLeft(this.buffer);
+					} else {
+						this.buffer.deleteAt(this.cursor.offset - 2, 2);
+						this.cursor.moveLeft(this.buffer);
+						this.cursor.moveLeft(this.buffer);
+					}
 				}
 				break;
 
@@ -128,6 +131,7 @@ function Input(editor) {
 
 			} else if (e.keyCode == 13) {
 				aux.value = '\n';
+				input.dispatchEvent(aux);
 				input.dispatchEvent(aux);
 			}
 		}

@@ -1,4 +1,7 @@
 class Parser {
+	/* Public
+	   ====== */
+
 	static stylize(text) {
 		let stylized = "";
 		let index = {
@@ -13,6 +16,57 @@ class Parser {
 		return stylized;
 	}
 
+	// This function is encharged to ensure that there is a correct amount of new lines between elements.
+	// And remove unnescesary new lines in block elements.
+	static format(text) {
+		let index = {
+			pos: 0
+		}
+		let formatted = '';
+
+		while (index.pos < text.length) {
+			if (this._isHeader(text, index)) {
+				while (index.pos < text.length) {
+					if (text[index.pos] === '\n') {
+						break;
+					}
+					formatted += text[index.pos];
+					index.pos += 1;
+				}
+				if (index.pos < text.length) {
+					formatted += text[index.pos];
+					index.pos += 1;
+					if (text[index.pos] !== '\n') {
+						formatted += '\n';
+					}
+				}
+
+			// Paragraph
+			} else {
+				while (index.pos < text.length) {
+					if (text[index.pos] === '\n' && this._isNewElement(text, index)) {
+						break;
+					}
+					if (text[index.pos] !== '\n') {
+						formatted += text[index.pos];
+					}
+					index.pos += 1;
+				}
+				if (index.pos < text.length) {
+					formatted += text[index.pos];
+					index.pos += 1;
+					if (text[index.pos] !== '\n') {
+						formatted += '\n';
+					}
+				}
+			}
+		}
+
+		return formatted;
+	}
+
+	/* Private
+	   ======= */
 	static _nextElement(text, index) {
 		if (this._isHeader(text, index) === true) {
 			return this._getHeader(text, index);
