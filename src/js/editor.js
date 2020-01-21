@@ -44,8 +44,21 @@ class NotebooksEditor {
 	// =======
 
 	_update() {
-		this.him.innerHTML = this.buffer.getText();
+		// Get text
+		let text = this.buffer.getText();
+
+		// Replace conflicting characters
+		text = text.replace(/&/g, '&amp;');
+		text = text.replace(/</g, '&lt;');
+		text = text.replace(/>/g, '&gt;');
+
+		// Stylize
 		//this.him.innerHTML = Parser.stylize(this.buffer.getText());
+
+		// Put on editor
+		this.him.innerHTML = text;
+
+		// Draw cursor
 		this.cursor.draw(this.him);
 	}
 

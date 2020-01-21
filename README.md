@@ -13,7 +13,7 @@ Created to have completely freedom for my app [Notebooks](https://github.com/amz
 - [x] moveLeft() (Add context)
 - [x] moveRight() (Add context)
 - [x] deleteAt()  (Add context)
-- [ ] Handle special html characters  (<, >, / (?), & (?))
+- [x] Handle special html characters  (<, >, / (?), & (?))
 - [ ] Add quotes
 - [ ] Add lists
     - [ ] Unordered

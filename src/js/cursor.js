@@ -88,7 +88,8 @@ class Cursor {
 		let state = {
 			offset: 0,
 			equivalent: 0,
-			tagOpened: false
+			tagOpened: false,
+			conflictingCharOpened: false
 		}
 
 		while (true) {
@@ -97,7 +98,7 @@ class Cursor {
 				break;
 			}
 
-			if (state.offset === offset && html[state.equivalent] !== '<' && state.tagOpened !== true) {
+			if (state.offset === offset && html[state.equivalent] !== '<' && state.tagOpened !== true && state.conflictingCharOpened !== true) {
 				break;
 			}
 
@@ -110,10 +111,22 @@ class Cursor {
 				state.tagOpened = false;
 				state.equivalent += 1;
 
+			} else if (html[state.equivalent] === '&') {
+				state.conflictingCharOpened = true;
+				state.equivalent += 1;
+
+			} else if (state.conflictingCharOpened === true && html[state.equivalent] === ';') {
+				state.conflictingCharOpened = false;
+				state.equivalent += 1;
+				state.offset += 1;
+
 			} else if (state.tagOpened === true) {
 				state.equivalent += 1;
 
-			} else if (state.tagOpened === false) {
+			} else if (state.conflictingCharOpened === true) {
+				state.equivalent += 1;
+
+			} else {
 				state.offset += 1;
 				state.equivalent += 1;
 			}
