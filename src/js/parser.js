@@ -78,6 +78,17 @@ class Parser {
 		}
 	}
 
+	static insert(buffer, cursor, char) {
+		if (char === '\n') {
+			buffer.insertAt(cursor.offset, '\n\n');
+			cursor.moveRight(buffer);
+			cursor.moveRight(buffer);
+		} else {
+			buffer.insertAt(cursor.offset, char);
+			cursor.moveRight(buffer);
+		}
+	}
+
 	/* Private
 	   ======= */
 	static _nextElement(text, index) {

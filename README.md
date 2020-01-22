@@ -21,7 +21,6 @@ Created to have completely freedom for my app [Notebooks](https://github.com/amz
     - [ ] Tasks
 - [ ] Add code
 - [ ] Add images
-- [ ] Add images
 - [ ] Add inline-tags
     - [ ] Bold
     - [ ] Italic

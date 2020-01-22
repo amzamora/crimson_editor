@@ -85,10 +85,9 @@ class NotebooksEditor {
 				Parser.delete(this.buffer, this.cursor);
 				break;
 
-			default:
+			default: // Insertion
 				if (e.value.length === 1) {
-					this.buffer.insertAt(this.cursor.offset, e.value);
-					this.cursor.moveRight(this.buffer);
+					Parser.insert(this.buffer, this.cursor, e.value);
 				}
 				break;
 		}
@@ -135,7 +134,6 @@ function Input(editor) {
 
 			} else if (e.keyCode == 13) {
 				aux.value = '\n';
-				input.dispatchEvent(aux);
 				input.dispatchEvent(aux);
 			}
 		}
