@@ -65,6 +65,19 @@ class Parser {
 		return formatted;
 	}
 
+	static delete(buffer, cursor) {
+		if (cursor.offset > 0) {
+			if (buffer.getText()[cursor.offset - 1] !== '\n') {
+				buffer.deleteAt(cursor.offset - 1, 1);
+				cursor.moveLeft(buffer);
+			} else {
+				buffer.deleteAt(cursor.offset - 2, 2);
+				cursor.moveLeft(buffer);
+				cursor.moveLeft(buffer);
+			}
+		}
+	}
+
 	/* Private
 	   ======= */
 	static _nextElement(text, index) {

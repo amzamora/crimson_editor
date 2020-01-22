@@ -82,16 +82,7 @@ class NotebooksEditor {
 				break;
 
 			case 'deletion':
-				if (this.cursor.offset > 0) {
-					if (this.buffer.getText()[this.cursor.offset - 1] !== '\n') {
-						this.buffer.deleteAt(this.cursor.offset - 1, 1);
-						this.cursor.moveLeft(this.buffer);
-					} else {
-						this.buffer.deleteAt(this.cursor.offset - 2, 2);
-						this.cursor.moveLeft(this.buffer);
-						this.cursor.moveLeft(this.buffer);
-					}
-				}
+				Parser.delete(this.buffer, this.cursor);
 				break;
 
 			default:
