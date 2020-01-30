@@ -65,19 +65,6 @@ class Parser {
 		return formatted;
 	}
 
-	static delete(buffer, cursor) {
-		if (cursor.offset > 0) {
-			if (buffer.getText()[cursor.offset - 1] !== '\n') {
-				buffer.deleteAt(cursor.offset - 1, 1);
-				cursor.moveLeft(buffer);
-			} else {
-				buffer.deleteAt(cursor.offset - 2, 2);
-				cursor.moveLeft(buffer);
-				cursor.moveLeft(buffer);
-			}
-		}
-	}
-
 	static insert(buffer, cursor, char) {
 		if (char === '\n') {
 			buffer.insertAt(cursor.offset, '\n\n');
@@ -86,6 +73,29 @@ class Parser {
 		} else {
 			buffer.insertAt(cursor.offset, char);
 			cursor.moveRight(buffer);
+		}
+	}
+
+	static delete(buffer, cursor) {
+		if (cursor.offset > 0) {
+			let text = buffer.getText();
+			if (text[cursor.offset - 1] === '\n') {
+				buffer.deleteAt(cursor.offset - 2, 2);
+				cursor.moveLeft(buffer);
+				cursor.moveLeft(buffer);
+			} else {
+				// Blockquote
+				if (text[cursor.offset - 1] === ' ' && text[cursor.offset - 2] === '>' && (cursor.offset - 3 >= 0 && text[cursor.offset - 3] === '\n')) {
+					buffer.deleteAt(cursor.offset - 2, 2);
+					cursor.moveLeft(buffer);
+					cursor.moveLeft(buffer);
+
+				// Paragraph
+				} else {
+					buffer.deleteAt(cursor.offset - 1, 1);
+					cursor.moveLeft(buffer);
+				}
+			}
 		}
 	}
 
