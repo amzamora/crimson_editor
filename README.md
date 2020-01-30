@@ -14,8 +14,8 @@ Created to have completely freedom for my app [Notebooks](https://github.com/amz
 - [x] moveRight() (Add context)
 - [x] deleteAt()  (Add context)
 - [x] Handle special html characters  (<, >, / (?), & (?))
-- [ ] Move cursor.moveLeft y cursor.moveRight to Parser
-- [ ] Add quotes
+- [x] Move cursor.moveLeft y cursor.moveRight to Parser
+- [x] Add quotes
 - [ ] Add lists
     - [ ] Unordered
     - [ ] Ordered

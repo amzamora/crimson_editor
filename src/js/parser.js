@@ -67,9 +67,20 @@ class Parser {
 
 	static insert(buffer, cursor, char) {
 		if (char === '\n') {
-			buffer.insertAt(cursor.offset, '\n\n');
-			cursor.moveRight(buffer);
-			cursor.moveRight(buffer);
+			let text = buffer.getText();
+
+			// Blockquote
+			if (text[cursor.offset - 1] === ' ' && text[cursor.offset - 2] === '>' && (cursor.offset - 3 === -1 || text[cursor.offset - 3] === '\n')) {
+				buffer.insertAt(cursor.offset - 3, '\n\n');
+				cursor.moveRight(buffer);
+				cursor.moveRight(buffer);
+
+			// Else
+			} else {
+				buffer.insertAt(cursor.offset, '\n\n');
+				cursor.moveRight(buffer);
+				cursor.moveRight(buffer);
+			}
 		} else {
 			buffer.insertAt(cursor.offset, char);
 			cursor.moveRight(buffer);
