@@ -28,4 +28,4 @@ Created to have completely freedom for my app [Notebooks](https://github.com/amz
     - [ ] Underline
     - [ ] Strike
     - [ ] Mark
-    - [ ] Add links (What types of links? What to do with files?)
+    - [ ] Add links (What types of links? What to do with files?) (Have links and boxed links(?))
