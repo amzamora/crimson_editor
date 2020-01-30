@@ -122,7 +122,19 @@ class Parser {
 }
 
 	static moveRight(buffer, cursor) {
-		cursor.moveRight(buffer);
+		let text = buffer.getText();
+		if (text[cursor.offset] === '\n') {
+			cursor.moveRight(buffer);
+			cursor.moveRight(buffer);
+
+			// Blockquote
+			if (text[cursor.offset] === '>' && text[cursor.offset + 1] === ' ') {
+				cursor.moveRight(buffer);
+				cursor.moveRight(buffer);
+			}
+		} else {
+			cursor.moveRight(buffer);
+		}
 	}
 
 	/* Private
