@@ -16,8 +16,7 @@ class Parser {
 		return stylized;
 	}
 
-	// This function is encharged to ensure that there is a correct amount of new lines between elements.
-	// And remove unnescesary new lines in block elements.
+	// This function is encharged to ensure that there is two new lines between block elements.
 	static format(text) {
 		let index = {
 			pos: 0
@@ -25,6 +24,7 @@ class Parser {
 		let formatted = '';
 
 		while (index.pos < text.length) {
+			// Header
 			if (this._isHeader(text, index)) {
 				while (index.pos < text.length) {
 					if (text[index.pos] === '\n') {
