@@ -68,11 +68,11 @@ class NotebooksEditor {
 	_onKeyboardInput(e) {
 		switch (e.value) {
 			case 'left-key':
-				this.cursor.moveLeft(this.buffer);
+				Parser.moveLeft(this.buffer, this.cursor);
 				break;
 
 			case 'right-key':
-				this.cursor.moveRight(this.buffer);
+				Parser.moveRight(this.buffer, this.cursor);
 				break;
 
 			case 'up-key':

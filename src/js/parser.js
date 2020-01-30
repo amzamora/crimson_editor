@@ -85,7 +85,7 @@ class Parser {
 				cursor.moveLeft(buffer);
 			} else {
 				// Blockquote
-				if (text[cursor.offset - 1] === ' ' && text[cursor.offset - 2] === '>' && (cursor.offset - 3 >= 0 && text[cursor.offset - 3] === '\n')) {
+				if (text[cursor.offset - 1] === ' ' && text[cursor.offset - 2] === '>' && (cursor.offset - 3 === -1 || text[cursor.offset - 3] === '\n')) {
 					buffer.deleteAt(cursor.offset - 2, 2);
 					cursor.moveLeft(buffer);
 					cursor.moveLeft(buffer);
@@ -97,6 +97,35 @@ class Parser {
 				}
 			}
 		}
+	}
+
+	static moveLeft(buffer, cursor) {
+		let text = buffer.getText();
+		if (cursor.offset > 0) {
+			let text = buffer.getText();
+			if (text[cursor.offset - 1] === '\n') {
+				cursor.moveLeft(buffer);
+				cursor.moveLeft(buffer);
+			} else {
+				// Blockquote
+				if (text[cursor.offset - 1] === ' ' && text[cursor.offset - 2] === '>') {
+					if (text[cursor.offset - 3] === '\n') {
+						cursor.moveLeft(buffer);
+						cursor.moveLeft(buffer);
+						cursor.moveLeft(buffer);
+						cursor.moveLeft(buffer);
+					}
+
+				// Paragraph
+				} else {
+					cursor.moveLeft(buffer);
+				}
+			}
+		}
+	}
+
+	static moveRight(buffer, cursor) {
+		cursor.moveRight(buffer);
 	}
 
 	/* Private
