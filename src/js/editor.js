@@ -22,6 +22,7 @@ class NotebooksEditor {
 
 	setText(text, cursor = -1) {
 		text = Parser.format(text);
+		console.log(text);
 		this.buffer.setText(text);
 		if (cursor !== - 1) {
 			this.cursor = new Cursor(cursor, this.buffer);

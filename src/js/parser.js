@@ -41,7 +41,7 @@ class Parser {
 					}
 				}
 
-			// Paragraph
+			// Paragraph | Blockquote | Lists
 			} else {
 				while (index.pos < text.length) {
 					if (text[index.pos] === '\n' && this._isNewElement(text, index)) {
@@ -52,11 +52,15 @@ class Parser {
 					}
 					index.pos += 1;
 				}
+				console.log(text[index.pos - 1]);
 				if (index.pos < text.length) {
 					formatted += text[index.pos];
 					index.pos += 1;
 					if (text[index.pos] !== '\n') {
 						formatted += '\n';
+					} else {
+						formatted += text[index.pos];
+						index.pos += 1;
 					}
 				}
 			}
