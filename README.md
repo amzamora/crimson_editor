@@ -29,3 +29,5 @@ Created to have completely freedom for my app [Notebooks](https://github.com/amz
     - [ ] Strike
     - [ ] Mark
     - [ ] Add links (What types of links? What to do with files?) (Have links and boxed links(?))
+
+Maybe move cursor.draw to editor.drawCursor?

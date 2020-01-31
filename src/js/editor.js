@@ -33,7 +33,7 @@ class NotebooksEditor {
 		let self = this;
 		setTimeout(function() {
 			self._update(); // This is also necessary
-		}, 100);
+		}, 200);
 	}
 
 	setFontSize(new_size) {
