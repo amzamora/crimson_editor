@@ -25,7 +25,7 @@ class Parser {
 
 		while (index.pos < text.length) {
 			// Header
-			if (this._isHeader(text, index)) {
+			if (this._isHeader(text, index.pos)) {
 				while (index.pos < text.length) {
 					if (text[index.pos] === '\n') {
 						break;
@@ -43,22 +43,29 @@ class Parser {
 
 			// Paragraph | Blockquote | Lists
 			} else {
+				let list = false;
+				if (this._isList(text, index.pos)) {
+					list = true;
+				}
+
 				while (index.pos < text.length) {
-					if (text[index.pos] === '\n' && this._isNewElement(text, index)) {
-						break;
+					if (text[index.pos] === '\n') {
+						if (this._isNewElement(text, index)) {
+							break;
+						}
 					}
 					if (text[index.pos] !== '\n') {
 						formatted += text[index.pos];
 					}
 					index.pos += 1;
 				}
-				console.log(text[index.pos - 1]);
 				if (index.pos < text.length) {
 					formatted += text[index.pos];
 					index.pos += 1;
-					if (text[index.pos] !== '\n') {
+					if (text[index.pos] !== '\n' && !list) {
 						formatted += '\n';
-					} else {
+
+					} else if (text[index.pos] === '\n') {
 						formatted += text[index.pos];
 						index.pos += 1;
 					}
@@ -155,23 +162,10 @@ class Parser {
 	/* Private
 	   ======= */
 	static _nextElement(text, index) {
-		if (this._isHeader(text, index) === true) {
+		if (this._isHeader(text, index.pos) === true) {
 			return this._getHeader(text, index);
 		} else {
 			return this._getParagraph(text, index);
-		}
-	}
-
-	static _isHeader(text, index) {
-		let i = index.pos;
-		while (text[i] === '#') {
-			i++;
-		}
-
-		if (i !==  index.pos && text[i] === ' ' && i - index.pos <= 3) {
-			return true;
-		} else {
-			return false;
 		}
 	}
 
@@ -217,7 +211,36 @@ class Parser {
 	}
 
 	static _isNewElement(text, index) {
-		if (text[index.pos + 1] === '\n' || this._isHeader(text, index.pos + 1)) {
+		if (text[index.pos + 1] === '\n' || this._isHeader(text, index.pos + 1) || this._isBlockquote(text, index.pos + 1) || this._isList(text, index.pos + 1)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	static _isHeader(text, index) {
+		let i = index;
+		while (text[i] === '#') {
+			i++;
+		}
+
+		if (i !== index && text[i] === ' ' && i - index <= 3) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	static _isBlockquote(text, index) {
+		if (text[index] === '>' && text[index + 1] === ' ') {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	static _isList(text, index) {
+		if (text[index] === '-' && text[index + 1] === ' ') {
 			return true;
 		} else {
 			return false;
