@@ -81,7 +81,7 @@ class Parser {
 			let text = buffer.getText();
 
 			// Blockquote
-			if (text[cursor.offset - 1] === ' ' && text[cursor.offset - 2] === '>' && (cursor.offset - 3 === -1 || text[cursor.offset - 3] === '\n')) {
+			if (this._isBlockquote(text, cursor.offset - 2)) {
 				buffer.insertAt(cursor.offset - 3, '\n\n');
 				cursor.moveRight(buffer);
 				cursor.moveRight(buffer);
@@ -91,6 +91,15 @@ class Parser {
 				buffer.insertAt(cursor.offset, '\n\n');
 				cursor.moveRight(buffer);
 				cursor.moveRight(buffer);
+
+				// If new element is created
+				let text = buffer.getText();
+
+				// Blockquote
+				if (this._isBlockquote(text, cursor.offset)) {
+					cursor.moveRight(buffer);
+					cursor.moveRight(buffer);
+				}
 			}
 		} else {
 			buffer.insertAt(cursor.offset, char);
@@ -107,7 +116,7 @@ class Parser {
 				cursor.moveLeft(buffer);
 			} else {
 				// Blockquote
-				if (text[cursor.offset - 1] === ' ' && text[cursor.offset - 2] === '>' && (cursor.offset - 3 === -1 || text[cursor.offset - 3] === '\n')) {
+				if (this._isBlockquote(text, cursor.offset - 2)) {
 					buffer.deleteAt(cursor.offset - 2, 2);
 					cursor.moveLeft(buffer);
 					cursor.moveLeft(buffer);
@@ -128,7 +137,7 @@ class Parser {
 			cursor.moveLeft(buffer);
 		} else {
 			// Blockquote
-			if (text[cursor.offset - 1] === ' ' && text[cursor.offset - 2] === '>' && (cursor.offset - 3 === -1 || text[cursor.offset - 3] === '\n')) {
+			if (this._isBlockquote(text, cursor.offset - 2)) {
 				if (text[cursor.offset - 3] === '\n') {
 					cursor.moveLeft(buffer);
 					cursor.moveLeft(buffer);
@@ -150,7 +159,7 @@ class Parser {
 			cursor.moveRight(buffer);
 
 			// Blockquote
-			if (text[cursor.offset] === '>' && text[cursor.offset + 1] === ' ') {
+			if (this._isBlockquote(text, cursor.offset)) {
 				cursor.moveRight(buffer);
 				cursor.moveRight(buffer);
 			}
@@ -219,31 +228,37 @@ class Parser {
 	}
 
 	static _isHeader(text, index) {
-		let i = index;
-		while (text[i] === '#') {
-			i++;
-		}
+		if (index === 0 || text[index - 1] === '\n') {
+			let i = index;
+			while (text[i] === '#') {
+				i++;
+			}
 
-		if (i !== index && text[i] === ' ' && i - index <= 3) {
-			return true;
-		} else {
-			return false;
+			if (i !== index && text[i] === ' ' && i - index <= 3) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 
 	static _isBlockquote(text, index) {
-		if (text[index] === '>' && text[index + 1] === ' ') {
-			return true;
-		} else {
-			return false;
+		if (index === 0 || text[index - 1] === '\n') {
+			if (text[index] === '>' && text[index + 1] === ' ') {
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 
 	static _isList(text, index) {
-		if (text[index] === '-' && text[index + 1] === ' ') {
-			return true;
-		} else {
-			return false;
+		if (index === 0 || text[index - 1] === '\n') {
+			if (text[index] === '-' && text[index + 1] === ' ') {
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 
