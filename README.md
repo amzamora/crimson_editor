@@ -18,10 +18,35 @@ Created to have completely freedom for my app [Notebooks](https://github.com/amz
 - [x] Add quotes
 - [ ] Add lists
     - [ ] Unordered
+        - [x] Format
+        - [ ] deleteAt
+        - [ ] insertAt
+        - [ ] moveLeft
+        - [ ] moveRight
     - [ ] Ordered
+        - [ ] Format
+        - [ ] deleteAt
+        - [ ] insertAt
+        - [ ] moveLeft
+        - [ ] moveRight
     - [ ] Tasks
+        - [ ] Format
+        - [ ] deleteAt
+        - [ ] insertAt
+        - [ ] moveLeft
+        - [ ] moveRight
 - [ ] Add code
+    - [ ] Format
+    - [ ] deleteAt
+    - [ ] insertAt
+    - [ ] moveLeft
+    - [ ] moveRight
 - [ ] Add images
+    - [ ] Format
+    - [ ] deleteAt
+    - [ ] insertAt
+    - [ ] moveLeft
+    - [ ] moveRight
 - [ ] Add inline-tags
     - [ ] Bold
     - [ ] Italic
