@@ -86,6 +86,26 @@ class Parser {
 				cursor.moveRight(buffer);
 				cursor.moveRight(buffer);
 
+			// List
+			} else if (this._isList(text, cursor.offset - 2)) {
+				console.log(text[cursor.offset - 4]);
+				// Connected to a list by the top
+				if (this._isList(text, this._getElementStart(text, cursor.offset - 4))) {
+					buffer.insertAt(cursor.offset - 3, '\n');
+					cursor.moveRight(buffer);
+				} else {
+					buffer.insertAt(cursor.offset - 3, '\n\n');
+					cursor.moveRight(buffer);
+					cursor.moveRight(buffer);
+				}
+
+			// Middle of list
+			} else if (this._isList(text, this._getElementStart(text, cursor.offset))) {
+				buffer.insertAt(cursor.offset, '\n- ');
+				cursor.moveRight(buffer);
+				cursor.moveRight(buffer);
+				cursor.moveRight(buffer);
+
 			// Else
 			} else {
 				buffer.insertAt(cursor.offset, '\n\n');
@@ -125,13 +145,13 @@ class Parser {
 					cursor.moveLeft(buffer);
 					cursor.moveLeft(buffer);
 
-					// If it is connected to a list by the top
+					// Connected to a list by the top
 					if (this._isList(text, this._getElementStart(text, cursor.offset - 2))) {
 						buffer.insertAt(cursor.offset, "\n");
 						cursor.moveRight(buffer);
 					}
 
-					// If is is connected to a list by the bottom
+					// Connected to a list by the bottom
 					if (this._isList(text, this._getElementEnd(text, cursor.offset) + 2)) {
 						buffer.insertAt(this._getElementEnd(text, cursor.offset), "\n");
 					}

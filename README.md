@@ -20,7 +20,7 @@ Created to have completely freedom for my app [Notebooks](https://github.com/amz
     - [ ] Unordered
         - [x] Format
         - [x] deleteAt
-        - [ ] insertAt
+        - [x] insertAt
         - [ ] moveLeft
         - [ ] moveRight
     - [ ] Ordered
