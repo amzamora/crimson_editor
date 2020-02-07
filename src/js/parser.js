@@ -104,7 +104,7 @@ class Parser {
 				}
 
 			// Middle of list
-			} else if (this._isList(text, this._getElementStart(text, cursor.offset))) {
+		} else if (this._isList(text, this._getElementStart(text, cursor.offset - 1))) {
 				buffer.insertAt(cursor.offset, '\n- ');
 				cursor.moveRight(buffer);
 				cursor.moveRight(buffer);

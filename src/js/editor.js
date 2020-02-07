@@ -54,14 +54,13 @@ class NotebooksEditor {
 		text = text.replace(/>/g, '&gt;');
 
 		// Stylize
-		text = Parser.stylize(text);
+		//text = Parser.stylize(text);
 
 		// Put on editor
 		this.him.innerHTML = text;
 
 		// Draw cursor
-		this.cursor.draw2(this.him);
-		this.him.innerHTML = this.him.innerHTML.replace(/\n/g, '');
+		this.cursor.draw(this.him);
 	}
 
 	// Callbacks
