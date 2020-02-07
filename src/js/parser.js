@@ -9,9 +9,15 @@ class Parser {
 		};
 		while (index.pos < text.length) {
 			stylized += this._nextElement(text, index);
+
+			while (text[index.pos] === '\n') {
+				index.pos += 1;
+			}
 		}
 
-		stylized = this._inline_stylize(stylized);
+		console.log(stylized);
+
+		//stylized = this._inline_stylize(stylized);
 
 		return stylized;
 	}
@@ -242,7 +248,7 @@ class Parser {
 			index.pos += 1;
 		}
 
-		header += '\n</span>';
+		header += '</span>';
 
 		return header;
 	}
@@ -253,11 +259,7 @@ class Parser {
 		// Get content
 		while (index.pos < text.length) {
 			if (text[index.pos] === '\n') {
-				if (this._isNewElement(text, index)) {
-					break;
-				}
-
-				index.pos += 1;
+				break;
 			}
 
 			paragraph += text[index.pos];

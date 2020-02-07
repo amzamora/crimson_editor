@@ -2,10 +2,11 @@
 .h1,
 .h2,
 .h3,
-.p,
+.paragraph,
 .blockquote {
 	display: block;
 	white-space: pre-wrap;
+	margin-bottom: 0.4em;
 }
 
 .h1 {

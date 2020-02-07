@@ -84,6 +84,10 @@ class Cursor {
 		cursor.style.height = height + 'px';
 	}
 
+	draw2(editor) {
+		editor.innerHTML = editor.innerHTML.substr(0, offset) + '|' + editor.innerHTML.substr(offset);
+	}
+
 	static _equivalentOffsetOnHtml(offset, html) {
 		let state = {
 			offset: 0,

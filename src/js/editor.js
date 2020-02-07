@@ -54,7 +54,7 @@ class NotebooksEditor {
 		text = text.replace(/>/g, '&gt;');
 
 		// Stylize
-		//this.him.innerHTML = Parser.stylize(this.buffer.getText());
+		//text = Parser.stylize(text);
 
 		// Put on editor
 		this.him.innerHTML = text;
