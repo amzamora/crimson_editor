@@ -126,7 +126,7 @@ class Parser {
 					cursor.moveLeft(buffer);
 
 					// If it is connected to a list by the top
-					if (this._isList(text, this._getElementStart(text, cursor.offset - 4))) {
+					if (this._isList(text, this._getElementStart(text, cursor.offset - 2))) {
 						buffer.insertAt(cursor.offset, "\n");
 						cursor.moveRight(buffer);
 					}

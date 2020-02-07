@@ -22,7 +22,7 @@ class NotebooksEditor {
 
 	setText(text, cursor = -1) {
 		text = Parser.format(text);
-		console.log(text);
+		console.log(text.replace(/\n/g, '\\n\n'));
 		this.buffer.setText(text);
 		if (cursor !== - 1) {
 			this.cursor = new Cursor(cursor, this.buffer);
