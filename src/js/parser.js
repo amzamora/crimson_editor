@@ -115,13 +115,27 @@ class Parser {
 				cursor.moveLeft(buffer);
 				cursor.moveLeft(buffer);
 			} else {
-				// Blockquote
 				if (this._isBlockquote(text, cursor.offset - 2)) {
 					buffer.deleteAt(cursor.offset - 2, 2);
 					cursor.moveLeft(buffer);
 					cursor.moveLeft(buffer);
 
-				// Paragraph
+				} else if (this._isList(text, cursor.offset - 2)) {
+					buffer.deleteAt(cursor.offset - 2, 2);
+					cursor.moveLeft(buffer);
+					cursor.moveLeft(buffer);
+
+					// If it is connected to a list by the top
+					if (this._isList(text, this._getElementStart(text, cursor.offset - 4))) {
+						buffer.insertAt(cursor.offset, "\n");
+						cursor.moveRight(buffer);
+					}
+
+					// If is is connected to a list by the bottom
+					if (this._isList(text, this._getElementEnd(text, cursor.offset) + 2)) {
+						buffer.insertAt(this._getElementEnd(text, cursor.offset), "\n");
+					}
+
 				} else {
 					buffer.deleteAt(cursor.offset - 1, 1);
 					cursor.moveLeft(buffer);
@@ -150,7 +164,7 @@ class Parser {
 				cursor.moveLeft(buffer);
 			}
 		}
-}
+	}
 
 	static moveRight(buffer, cursor) {
 		let text = buffer.getText();
@@ -240,6 +254,7 @@ class Parser {
 				return false;
 			}
 		}
+		return false;
 	}
 
 	static _isBlockquote(text, index) {
@@ -250,6 +265,7 @@ class Parser {
 				return false;
 			}
 		}
+		return false;
 	}
 
 	static _isList(text, index) {
@@ -260,6 +276,34 @@ class Parser {
 				return false;
 			}
 		}
+		return false;
+	}
+
+	// Return the starting index of the element at the cursor
+	static _getElementStart(text, index) {
+		if (index >= 0 && text[index] !== '\n') {
+			while (index > 0) {
+				if (text[index - 1] === '\n') {
+					break;
+				}
+				index -= 1;
+			}
+			return index;
+		}
+		return -1;
+	}
+
+	static _getElementEnd(text, index) {
+		if (index <= text.length && text[index] !== '\n') {
+			while (true) {
+				if (text[index + 1] === '\n' || index + 1 === text.length) {
+					break;
+				}
+				index += 1;
+			}
+			return index;
+		}
+		return -1;
 	}
 
 	static _inline_stylize(stylized) {
