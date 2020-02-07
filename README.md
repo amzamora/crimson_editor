@@ -21,8 +21,8 @@ Created to have completely freedom for my app [Notebooks](https://github.com/amz
         - [x] Format
         - [x] deleteAt
         - [x] insertAt
-        - [ ] moveLeft
-        - [ ] moveRight
+        - [x] moveLeft
+        - [x] moveRight
     - [ ] Ordered
         - [ ] Format
         - [ ] deleteAt

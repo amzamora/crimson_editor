@@ -88,7 +88,6 @@ class Parser {
 
 			// List
 			} else if (this._isList(text, cursor.offset - 2)) {
-				console.log(text[cursor.offset - 4]);
 				// Connected to a list by the top
 				if (this._isList(text, this._getElementStart(text, cursor.offset - 4))) {
 					buffer.insertAt(cursor.offset - 3, '\n');
@@ -172,10 +171,17 @@ class Parser {
 		} else {
 			// Blockquote
 			if (this._isBlockquote(text, cursor.offset - 2)) {
-				if (text[cursor.offset - 3] === '\n') {
-					cursor.moveLeft(buffer);
-					cursor.moveLeft(buffer);
-					cursor.moveLeft(buffer);
+				cursor.moveLeft(buffer);
+				cursor.moveLeft(buffer);
+				cursor.moveLeft(buffer);
+				cursor.moveLeft(buffer);
+
+			// List
+			} else if (this._isList(text, cursor.offset - 2)) {
+				cursor.moveLeft(buffer);
+				cursor.moveLeft(buffer);
+				cursor.moveLeft(buffer);
+				if (text[cursor.offset - 1] === '\n') {
 					cursor.moveLeft(buffer);
 				}
 
@@ -195,6 +201,11 @@ class Parser {
 			// Blockquote
 			if (this._isBlockquote(text, cursor.offset)) {
 				cursor.moveRight(buffer);
+				cursor.moveRight(buffer);
+			}
+
+			// List
+			if (this._isList(text, cursor.offset - 1)) {
 				cursor.moveRight(buffer);
 			}
 		} else {
