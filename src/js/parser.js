@@ -195,8 +195,12 @@ class Parser {
 	static moveRight(buffer, cursor) {
 		let text = buffer.getText();
 		if (text[cursor.offset] === '\n') {
-			cursor.moveRight(buffer);
-			cursor.moveRight(buffer);
+			if (this._isList(text, cursor.offset + 1)) {
+				cursor.moveRight(buffer);
+			} else {
+				cursor.moveRight(buffer);
+				cursor.moveRight(buffer);
+			}
 
 			// Blockquote
 			if (this._isBlockquote(text, cursor.offset)) {
@@ -205,7 +209,8 @@ class Parser {
 			}
 
 			// List
-			if (this._isList(text, cursor.offset - 1)) {
+			if (this._isList(text, cursor.offset)) {
+				cursor.moveRight(buffer);
 				cursor.moveRight(buffer);
 			}
 		} else {
