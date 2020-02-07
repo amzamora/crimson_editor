@@ -147,13 +147,8 @@ class Parser {
 
 					// Connected to a list by the top
 					if (this._isList(text, this._getElementStart(text, cursor.offset - 2))) {
-						buffer.insertAt(cursor.offset, "\n");
-						cursor.moveRight(buffer);
-					}
-
-					// Connected to a list by the bottom
-					if (this._isList(text, this._getElementEnd(text, cursor.offset) + 2)) {
-						buffer.insertAt(this._getElementEnd(text, cursor.offset), "\n");
+						buffer.deleteAt(cursor.offset - 1, 1);
+						cursor.moveLeft(buffer);
 					}
 
 				} else {
