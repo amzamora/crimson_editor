@@ -85,7 +85,10 @@ class Cursor {
 	}
 
 	draw2(editor) {
+		let offset = Cursor._equivalentOffsetOnHtml(this.offset, editor.innerHTML);
 		editor.innerHTML = editor.innerHTML.substr(0, offset) + '|' + editor.innerHTML.substr(offset);
+		console.log(editor.innerHTML.replace(/\n/g, '\\n\n'));
+		console.log("\n\n");
 	}
 
 	static _equivalentOffsetOnHtml(offset, html) {
@@ -102,7 +105,7 @@ class Cursor {
 				break;
 			}
 
-			if (state.offset === offset && html[state.equivalent] !== '<' && state.tagOpened !== true && state.conflictingCharOpened !== true) {
+			if (state.offset === offset && state.tagOpened !== true && state.conflictingCharOpened !== true && !(html[state.equivalent] === '<' && html[state.equivalent + 1] !== '/')) {
 				break;
 			}
 

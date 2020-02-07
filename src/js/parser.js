@@ -11,11 +11,10 @@ class Parser {
 			stylized += this._nextElement(text, index);
 
 			while (text[index.pos] === '\n') {
+				stylized += '\n';
 				index.pos += 1;
 			}
 		}
-
-		console.log(stylized);
 
 		//stylized = this._inline_stylize(stylized);
 
