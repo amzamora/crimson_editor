@@ -17,7 +17,7 @@ Created to have completely freedom for my app [Notebooks](https://github.com/amz
 - [x] Move cursor.moveLeft y cursor.moveRight to Parser
 - [x] Add quotes
 - [ ] Add lists
-    - [ ] Unordered
+    - [x] Unordered
         - [x] Format
         - [x] deleteAt
         - [x] insertAt
