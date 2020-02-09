@@ -60,7 +60,110 @@ class NotebooksEditor {
 		this.him.innerHTML = text;
 
 		// Draw cursor
-		this.cursor.draw(this.him);
+		this._drawCursor(this.cursor);
+	}
+
+	_drawCursor(cursor) {
+		// Find position of cursor
+		// -----------------------
+		let offset = this._equivalentOffsetOnHtml(cursor.offset, this.him.innerHTML);
+
+		// All this is to avoid breaking words where they shouldn't (FIX THIS)
+		function isWhiteSpace(char) {return char === ' ' || char === '\n' || char === '<' || char === '>'}
+
+		let aux1 = offset - 1;
+		while (!isWhiteSpace(this.him.innerHTML[aux1])) {
+			if (aux1 < 1) {
+				aux1 = 0;
+				break;
+			}
+			aux1 -= 1;
+		}
+		if (aux1 !== 0) {aux1 += 1}
+
+		let aux2 = offset;
+		while (!isWhiteSpace(this.him.innerHTML[aux2])) {
+			if (aux2 > this.him.innerHTML.length) {
+				aux2 = this.him.innerHTML.length;
+				break;
+			}
+			aux2 += 1;
+		}
+
+		// Put false cursor editor to get its position
+		this.him.innerHTML = this.him.innerHTML.substr(0, aux1) + '<nobr>' + this.him.innerHTML.substring(aux1, offset) + '<erase-me class="cursor"></erase-me>' + this.him.innerHTML.substring(offset, aux2) + '</nobr>' + this.him.innerHTML.substr(aux2);
+
+		// Remove new lines from text (If they stay the measurement is affected, yet new lines are needed to find the correct cursor offset)
+		//this.him.innerHTML = this.him.innerHTML.replace(/\n/g, '');
+
+		// Measure stuff
+		let eraseMe = document.getElementsByTagName('erase-me')[0];
+		let offsetLeft = eraseMe.offsetLeft;
+		let offsetTop = eraseMe.offsetTop;
+		let height = eraseMe.clientHeight;
+
+		// Remove added stuff
+		this.him.innerHTML = this.him.innerHTML.replace('<erase-me class="cursor"></erase-me>', '');
+		this.him.innerHTML = this.him.innerHTML.replace(/<\/?nobr>/g, '');
+
+		// Put real cursor on editor
+		// -------------------------
+		this.him.innerHTML = `<cursor${this.number} class="cursor"></cursor${this.number}>` + this.him.innerHTML;
+		cursor = document.getElementsByTagName(`cursor${this.number}`)[0];
+		cursor.style.left = offsetLeft + 'px';
+		cursor.style.top = offsetTop + 'px';
+		cursor.style.height = height + 'px';
+	}
+
+	_equivalentOffsetOnHtml(offset, html) {
+		let state = {
+			offset: 0,
+			equivalent: 0,
+			tagOpened: false,
+			conflictingCharOpened: false
+		}
+
+		while (true) {
+			// Check end conditions
+			if (state.equivalent >= html.length) {
+				break;
+			}
+
+			if (state.offset === offset && state.tagOpened !== true && state.conflictingCharOpened !== true && !(html[state.equivalent] === '<' && html[state.equivalent + 1] !== '/')) {
+				break;
+			}
+
+			// Advance state
+			if (html[state.equivalent] === '<') {
+				state.tagOpened = true;
+				state.equivalent += 1;
+
+			} else if (html[state.equivalent] === '>') {
+				state.tagOpened = false;
+				state.equivalent += 1;
+
+			} else if (html[state.equivalent] === '&') {
+				state.conflictingCharOpened = true;
+				state.equivalent += 1;
+
+			} else if (state.conflictingCharOpened === true && html[state.equivalent] === ';') {
+				state.conflictingCharOpened = false;
+				state.equivalent += 1;
+				state.offset += 1;
+
+			} else if (state.tagOpened === true) {
+				state.equivalent += 1;
+
+			} else if (state.conflictingCharOpened === true) {
+				state.equivalent += 1;
+
+			} else {
+				state.offset += 1;
+				state.equivalent += 1;
+			}
+		}
+
+		return state.equivalent;
 	}
 
 	// Callbacks
