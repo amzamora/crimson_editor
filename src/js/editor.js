@@ -57,7 +57,7 @@ class NotebooksEditor {
 		text = this._putFalseCursor(text, this.cursor);
 
 		// Stylize
-		console.log(Parser.stylize(text));
+		//console.log(Parser.stylize(text));
 		text = Parser.stylize(text);
 
 		// Put on editor
@@ -101,9 +101,6 @@ class NotebooksEditor {
 	}
 
 	_drawCursor() {
-		// Remove new lines from text (If they stay the measurement is affected, yet new lines are needed to find the correct cursor offset)
-		this.him.innerHTML = this.him.innerHTML.replace(/\n/g, '');
-
 		// Measure stuff from false cursor
 		let eraseMe = document.getElementsByTagName('erase-me')[0];
 		let offsetLeft = eraseMe.offsetLeft;

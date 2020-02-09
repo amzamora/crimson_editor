@@ -9,11 +9,6 @@ class Parser {
 		};
 		while (index.pos < text.length) {
 			stylized += this._nextElement(text, index);
-
-			while (text[index.pos] === '\n') {
-				stylized += '\n';
-				index.pos += 1;
-			}
 		}
 
 		//stylized = this._inline_stylize(stylized);
@@ -251,6 +246,12 @@ class Parser {
 			index.pos += 1;
 		}
 
+		// Move until new element
+		while (text[index.pos] === '\n') {
+			header += '&shy;';
+			index.pos += 1;
+		}
+
 		header += '</span>';
 
 		return header;
@@ -266,6 +267,12 @@ class Parser {
 			}
 
 			paragraph += text[index.pos];
+			index.pos += 1;
+		}
+
+		// Move until new element
+		while (text[index.pos] === '\n') {
+			paragraph += '&shy;';
 			index.pos += 1;
 		}
 
@@ -288,7 +295,7 @@ class Parser {
 			index.pos += 2;
 			while (index.pos < text.length) {
 				if (text[index.pos] === '\n') {
-					list += '\n';
+					list += '&shy;';
 					break;
 				}
 				list += text[index.pos];
@@ -298,7 +305,12 @@ class Parser {
 
 			// Advance until new sub item
 			index.pos += 1;
-			console.log(text[index.pos]);
+		}
+
+		// Move until new element
+		while (text[index.pos] === '\n') {
+			list = list.substr(0, list.length - 5) + '&shy;' + list.substr(list.length - 5);
+			index.pos += 1;
 		}
 
 		list += '</ul>';
