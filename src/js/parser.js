@@ -226,8 +226,12 @@ class Parser {
 	/* Private
 	   ======= */
 	static _nextElement(text, index) {
-		if (this._isHeader(text, index.pos) === true) {
+		if (this._isHeader(text, index.pos)) {
 			return this._getHeader(text, index);
+
+		} else if (this._isList(text, index.pos)) {
+			return this._getList(text, index);
+
 		} else {
 			return this._getParagraph(text, index);
 		}
@@ -268,6 +272,38 @@ class Parser {
 		paragraph += '</span>';
 
 		return paragraph;
+	}
+
+	static _getList(text, index) {
+		let list = '<ul>';
+
+		// Get sub items
+		while (index.pos < text.length) {
+			if (text[index.pos] === '\n') {
+				break;
+			}
+
+			// Get subItem
+			list += '<li>';
+			index.pos += 2;
+			while (index.pos < text.length) {
+				if (text[index.pos] === '\n') {
+					list += '\n';
+					break;
+				}
+				list += text[index.pos];
+				index.pos += 1;
+			}
+ 			list += '</li>';
+
+			// Advance until new sub item
+			index.pos += 1;
+			console.log(text[index.pos]);
+		}
+
+		list += '</ul>';
+
+		return list;
 	}
 
 	static _isNewElement(text, index) {

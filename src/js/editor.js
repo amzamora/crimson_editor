@@ -22,7 +22,7 @@ class NotebooksEditor {
 
 	setText(text, cursor = -1) {
 		text = Parser.format(text);
-		console.log(text.replace(/\n/g, '\\n\n'));
+		//console.log(text.replace(/\n/g, '\\n\n'));
 		this.buffer.setText(text);
 		if (cursor !== - 1) {
 			this.cursor = new Cursor(cursor, this.buffer);
@@ -53,26 +53,30 @@ class NotebooksEditor {
 		text = text.replace(/</g, '&lt;');
 		text = text.replace(/>/g, '&gt;');
 
+		// Put false cursor
+		text = this._putFalseCursor(text, this.cursor);
+
 		// Stylize
-		//text = Parser.stylize(text);
+		console.log(Parser.stylize(text));
+		text = Parser.stylize(text);
 
 		// Put on editor
 		this.him.innerHTML = text;
 
-		// Draw cursor
-		this._drawCursor(this.cursor);
+		// Remove false and put real cursor
+		this._drawCursor();
 	}
 
-	_drawCursor(cursor) {
+	_putFalseCursor(text, cursor) {
 		// Find position of cursor
 		// -----------------------
-		let offset = this._equivalentOffsetOnHtml(cursor.offset, this.him.innerHTML);
+		let offset = this._equivalentOffsetOnHtml(cursor.offset, text);
 
 		// All this is to avoid breaking words where they shouldn't (FIX THIS)
 		function isWhiteSpace(char) {return char === ' ' || char === '\n' || char === '<' || char === '>'}
 
 		let aux1 = offset - 1;
-		while (!isWhiteSpace(this.him.innerHTML[aux1])) {
+		while (!isWhiteSpace(text[aux1])) {
 			if (aux1 < 1) {
 				aux1 = 0;
 				break;
@@ -82,21 +86,25 @@ class NotebooksEditor {
 		if (aux1 !== 0) {aux1 += 1}
 
 		let aux2 = offset;
-		while (!isWhiteSpace(this.him.innerHTML[aux2])) {
-			if (aux2 > this.him.innerHTML.length) {
-				aux2 = this.him.innerHTML.length;
+		while (!isWhiteSpace(text[aux2])) {
+			if (aux2 > text.length) {
+				aux2 = text.length;
 				break;
 			}
 			aux2 += 1;
 		}
 
 		// Put false cursor editor to get its position
-		this.him.innerHTML = this.him.innerHTML.substr(0, aux1) + '<nobr>' + this.him.innerHTML.substring(aux1, offset) + '<erase-me class="cursor"></erase-me>' + this.him.innerHTML.substring(offset, aux2) + '</nobr>' + this.him.innerHTML.substr(aux2);
+		text = text.substr(0, aux1) + '<nobr>' + text.substring(aux1, offset) + '<erase-me class="cursor"></erase-me>' + text.substring(offset, aux2) + '</nobr>' + text.substr(aux2);
 
+		return text;
+	}
+
+	_drawCursor() {
 		// Remove new lines from text (If they stay the measurement is affected, yet new lines are needed to find the correct cursor offset)
-		//this.him.innerHTML = this.him.innerHTML.replace(/\n/g, '');
+		this.him.innerHTML = this.him.innerHTML.replace(/\n/g, '');
 
-		// Measure stuff
+		// Measure stuff from false cursor
 		let eraseMe = document.getElementsByTagName('erase-me')[0];
 		let offsetLeft = eraseMe.offsetLeft;
 		let offsetTop = eraseMe.offsetTop;
@@ -108,8 +116,8 @@ class NotebooksEditor {
 
 		// Put real cursor on editor
 		// -------------------------
-		this.him.innerHTML = `<cursor${this.number} class="cursor"></cursor${this.number}>` + this.him.innerHTML;
-		cursor = document.getElementsByTagName(`cursor${this.number}`)[0];
+		this.him.innerHTML = `<cursor${this.cursor.number} class="cursor"></cursor${this.cursor.number}>` + this.him.innerHTML;
+		let cursor = document.getElementsByTagName(`cursor${this.cursor.number}`)[0];
 		cursor.style.left = offsetLeft + 'px';
 		cursor.style.top = offsetTop + 'px';
 		cursor.style.height = height + 'px';
