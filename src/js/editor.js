@@ -95,26 +95,26 @@ class NotebooksEditor {
 		}
 
 		// Put false cursor editor to get its position
-		text = text.substr(0, aux1) + '<nobr>' + text.substring(aux1, offset) + '<erase-me class="cursor"></erase-me>' + text.substring(offset, aux2) + '</nobr>' + text.substr(aux2);
+		text = text.substr(0, aux1) + '<nobr>' + text.substring(aux1, offset) + `<false${cursor.id} class="cursor"></false${cursor.id}>` + text.substring(offset, aux2) + '</nobr>' + text.substr(aux2);
 
 		return text;
 	}
 
-	_drawCursor() {
+	_drawCursor(cursor) {
 		// Measure stuff from false cursor
-		let eraseMe = document.getElementsByTagName('erase-me')[0];
+		let eraseMe = document.getElementsByTagName(`false${cursor.id}`)[0];
 		let offsetLeft = eraseMe.offsetLeft;
 		let offsetTop = eraseMe.offsetTop;
 		let height = eraseMe.clientHeight;
 
 		// Remove added stuff
-		this.him.innerHTML = this.him.innerHTML.replace('<erase-me class="cursor"></erase-me>', '');
+		this.him.innerHTML = this.him.innerHTML.replace(`<false${cursor.id} class="cursor"></false${cursor.id}>`, '');
 		this.him.innerHTML = this.him.innerHTML.replace(/<\/?nobr>/g, '');
 
 		// Put real cursor on editor
 		// -------------------------
 		this.him.innerHTML = `<cursor${this.cursor.number} class="cursor"></cursor${this.cursor.number}>` + this.him.innerHTML;
-		let cursor = document.getElementsByTagName(`cursor${this.cursor.number}`)[0];
+		cursor = document.getElementsByTagName(`cursor${this.cursor.number}`)[0];
 		cursor.style.left = offsetLeft + 'px';
 		cursor.style.top = offsetTop + 'px';
 		cursor.style.height = height + 'px';
