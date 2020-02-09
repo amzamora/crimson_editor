@@ -64,7 +64,7 @@ class NotebooksEditor {
 		this.him.innerHTML = text;
 
 		// Remove false and put real cursor
-		this._drawCursor();
+		this._drawCursor(this.cursor);
 	}
 
 	_putFalseCursor(text, cursor) {
