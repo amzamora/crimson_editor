@@ -247,10 +247,9 @@ class Parser {
 		}
 
 		// Move until new element
-		while (text[index.pos] === '\n') {
-			header += '&shy;';
-			index.pos += 1;
-		}
+		header += '&shy;'; // Put &shy; instead of newlines
+		header += '&shy;';
+		index.pos += 2;
 
 		header += '</span>';
 
@@ -271,10 +270,9 @@ class Parser {
 		}
 
 		// Move until new element
-		while (text[index.pos] === '\n') {
-			paragraph += '&shy;';
-			index.pos += 1;
-		}
+		paragraph += '&shy;'; // put &shy; instead of newlines
+		paragraph += '&shy;';
+		index.pos += 2;
 
 		paragraph += '</span>';
 
@@ -308,10 +306,8 @@ class Parser {
 		}
 
 		// Move until new element
-		while (text[index.pos] === '\n') {
-			list = list.substr(0, list.length - 5) + '&shy;' + list.substr(list.length - 5);
-			index.pos += 1;
-		}
+		list = list.substr(0, list.length - 5) + '&shy;' + list.substr(list.length - 5); // put &shy; instead of newlines
+		index.pos += 1;
 
 		list += '</ul>';
 
