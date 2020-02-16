@@ -57,26 +57,23 @@ class NotebooksEditor {
 		//console.log(Parser.stylize(text));
 		text = Parser.stylize(text);
 
-		// Put false cursor
-		text = this._putFalseCursor(text, this.cursor);
-
 		// Put on editor
 		this.him.innerHTML = text;
 
-		// Remove false and put real cursor
+		// Draw cursor
 		this._drawCursor(this.cursor);
 	}
 
-	_putFalseCursor(text, cursor) {
+	_drawCursor(cursor) {
 		// Find position of cursor
 		// -----------------------
-		let offset = this._equivalentOffsetOnHtml(cursor.offset, text);
+		let offset = this._equivalentOffsetOnHtml(cursor.offset, this.him.innerHTML);
 
 		// All this is to avoid breaking words where they shouldn't (FIX THIS)
 		function isWhiteSpace(char) {return char === ' ' || char === '\n' || char === '<' || char === '>'}
 
 		let aux1 = offset - 1;
-		while (!isWhiteSpace(text[aux1])) {
+		while (!isWhiteSpace(this.him.innerHTML[aux1])) {
 			if (aux1 < 1) {
 				aux1 = 0;
 				break;
@@ -86,35 +83,31 @@ class NotebooksEditor {
 		if (aux1 !== 0) {aux1 += 1}
 
 		let aux2 = offset;
-		while (!isWhiteSpace(text[aux2])) {
-			if (aux2 > text.length) {
-				aux2 = text.length;
+		while (!isWhiteSpace(this.him.innerHTML[aux2])) {
+			if (aux2 > this.him.innerHTML.length) {
+				aux2 = this.him.innerHTML.length;
 				break;
 			}
 			aux2 += 1;
 		}
 
 		// Put false cursor editor to get its position
-		text = text.substr(0, aux1) + '<nobr>' + text.substring(aux1, offset) + `<false${cursor.id} class="cursor"></false${cursor.id}>` + text.substring(offset, aux2) + '</nobr>' + text.substr(aux2);
+		this.him.innerHTML = this.him.innerHTML.substr(0, aux1) + '<nobr>' + this.him.innerHTML.substring(aux1, offset) + '<erase-me class="cursor"></erase-me>' + this.him.innerHTML.substring(offset, aux2) + '</nobr>' + this.him.innerHTML.substr(aux2);
 
-		return text;
-	}
-
-	_drawCursor(cursor) {
-		// Measure stuff from false cursor
-		let eraseMe = document.getElementsByTagName(`false${cursor.id}`)[0];
+		// Measure stuff
+		let eraseMe = document.getElementsByTagName('erase-me')[0];
 		let offsetLeft = eraseMe.offsetLeft;
 		let offsetTop = eraseMe.offsetTop;
 		let height = eraseMe.clientHeight;
 
 		// Remove added stuff
-		this.him.innerHTML = this.him.innerHTML.replace(`<false${cursor.id} class="cursor"></false${cursor.id}>`, '');
+		this.him.innerHTML = this.him.innerHTML.replace('<erase-me class="cursor"></erase-me>', '');
 		this.him.innerHTML = this.him.innerHTML.replace(/<\/?nobr>/g, '');
 
 		// Put real cursor on editor
 		// -------------------------
-		this.him.innerHTML = `<cursor${this.cursor.number} class="cursor"></cursor${this.cursor.number}>` + this.him.innerHTML;
-		cursor = document.getElementsByTagName(`cursor${this.cursor.number}`)[0];
+		this.him.innerHTML = `<cursor${this.id} class="cursor"></cursor${this.id}>` + this.him.innerHTML;
+		cursor = document.getElementsByTagName(`cursor${this.id}`)[0];
 		cursor.style.left = offsetLeft + 'px';
 		cursor.style.top = offsetTop + 'px';
 		cursor.style.height = height + 'px';
