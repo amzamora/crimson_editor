@@ -247,8 +247,8 @@ class Parser {
 		}
 
 		// Move until new element
-		header += '&shy;'; // Put &shy; instead of newlines
-		header += '&shy;';
+		header += ' '; // Put ' ' instead of newlines
+		header += ' ';
 		index.pos += 2;
 
 		header += '</span>';
@@ -270,8 +270,8 @@ class Parser {
 		}
 
 		// Move until new element
-		paragraph += '&shy;'; // put &shy; instead of newlines
-		paragraph += '&shy;';
+		paragraph += ' '; // put ' ' instead of newlines
+		paragraph += ' ';
 		index.pos += 2;
 
 		paragraph += '</span>';
@@ -289,11 +289,11 @@ class Parser {
 			}
 
 			// Get subItem
-			list += '<li>';
+			list += '<li><span style="display: none;">- </span>';
 			index.pos += 2;
 			while (index.pos < text.length) {
 				if (text[index.pos] === '\n') {
-					list += '&shy;';
+					list += ' ';
 					break;
 				}
 				list += text[index.pos];
@@ -306,7 +306,7 @@ class Parser {
 		}
 
 		// Move until new element
-		list = list.substr(0, list.length - 5) + '&shy;' + list.substr(list.length - 5); // put &shy; instead of newlines
+		list = list.substr(0, list.length - 5) + ' ' + list.substr(list.length - 5); // put ' ' instead of newlines
 		index.pos += 1;
 
 		list += '</ul>';
