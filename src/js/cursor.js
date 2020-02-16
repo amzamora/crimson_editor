@@ -14,7 +14,7 @@ class Cursor {
 		}
 
 		this.offset = offset;
-		this.number = count();
+		this.id = count();
 	}
 
 	moveLeft(buffer) {

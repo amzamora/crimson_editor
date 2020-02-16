@@ -53,12 +53,12 @@ class NotebooksEditor {
 		text = text.replace(/</g, '&lt;');
 		text = text.replace(/>/g, '&gt;');
 
-		// Put false cursor
-		text = this._putFalseCursor(text, this.cursor);
-
 		// Stylize
 		//console.log(Parser.stylize(text));
 		text = Parser.stylize(text);
+
+		// Put false cursor
+		text = this._putFalseCursor(text, this.cursor);
 
 		// Put on editor
 		this.him.innerHTML = text;
@@ -134,7 +134,7 @@ class NotebooksEditor {
 				break;
 			}
 
-			if (state.offset === offset && state.tagOpened !== true && state.conflictingCharOpened !== true && !(html[state.equivalent] === '<' && html[state.equivalent + 1] !== '/')) {
+			if (state.offset === offset && state.tagOpened !== true && state.conflictingCharOpened !== true && html[state.equivalent] !== '<') {
 				break;
 			}
 
