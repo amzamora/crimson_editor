@@ -1,6 +1,6 @@
-# Typo editor
+# Notebooks editor
 
-Created to have completely freedom for my app [Typo](https://github.com/amzamora/typo).
+Created to have completely freedom for my app [Notebooks](https://github.com/amzamora/notebooks).
 
 ## How to use it
 
