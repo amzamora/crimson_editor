@@ -1,10 +1,10 @@
-class TypoEditor {
+class NotebooksEditor {
 	constructor (anchor) {
 		// Initialize editor
 		this.him = document.getElementById(anchor);
-		this.him.classList.add('CrimsonEditor');
+		this.him.classList.add('NotebooksEditor');
 		this.him.innerHTML = '';
-		this.cursor = new Cursor(this.him);
+		this.buffer = new Buffer();
 
 		// Attach callbacks to manage input
 		this.input = Input(this.him);
@@ -16,122 +16,200 @@ class TypoEditor {
 			self._onClick(e);
 		});
 		window.addEventListener('resize', function(e) {
-			for (let child of self.him.children) {
-				self._wrapText(child);
-			}
+			self._update();
 		});
 	}
 
-	setText(text) {
-		this.him.innerHTML = '';
-		Parser.put_text_on_editor(text, this.him);
-
-		for (let child of this.him.children) {
-			this._wrapText(child);
+	setText(text, cursor = -1) {
+		text = Parser.format(text);
+		//console.log(text.replace(/\n/g, '\\n\n'));
+		this.buffer.setText(text);
+		if (cursor !== - 1) {
+			this.cursor = new Cursor(cursor, this.buffer);
+		} else {
+			this.cursor = new Cursor(text.length, this.buffer);
 		}
 
-		this.cursor.setPosition(); // setPosition(element, offset);
+		this._update(); // This is necessary
+		let self = this;
+		setTimeout(function() {
+			self._update(); // This is also necessary
+		}, 200);
 	}
 
 	setFontSize(new_size) {
 
 	}
 
-	getText() {
-		let text = "";
-		for (let child of this.him.childNodes) {
-			text += child.innerHTML;
-		}
-		return text;
+	// Private
+	// =======
+
+	_update() {
+		// Get text
+		let text = this.buffer.getText();
+
+		// Replace conflicting characters
+		text = text.replace(/&/g, '&amp;');
+		text = text.replace(/</g, '&lt;');
+		text = text.replace(/>/g, '&gt;');
+
+		// Stylize
+		//console.log(Parser.stylize(text));
+		text = Parser.stylize(text);
+
+		// Put on editor
+		this.him.innerHTML = text;
+
+		// Draw cursor
+		this._drawCursor(this.cursor);
 	}
 
-	/* Private
-	   ======= */
+	_drawCursor(cursor) {
+		// Find position of cursor
+		// -----------------------
+		let offset = this._equivalentOffsetOnHtml(cursor.offset, this.him.innerHTML);
 
-	_wrapText(element) {
-		element.innerHTML = element.innerHTML.replace(/<br>/g, ' ');
+		// All this is to avoid breaking words where they shouldn't (FIX THIS)
+		function isWhiteSpace(char) {return char === ' ' || char === '\n' || char === '<' || char === '>'}
 
-		let clone = element.cloneNode(false);
-		clone.style.display = "inline-block";
-		this.him.appendChild(clone);
+		let aux1 = offset - 1;
+		while (!isWhiteSpace(this.him.innerHTML[aux1])) {
+			if (aux1 < 1) {
+				aux1 = 0;
+				break;
+			}
+			aux1 -= 1;
+		}
+		if (aux1 !== 0) {aux1 += 1}
 
-		let words = element.innerHTML.split(' ');
-		clone.innerHTML += words.shift();
-		for (let word of words) {
-			if (word.length === 0) {
-				clone.innerHTML += ' ';
+		let aux2 = offset;
+		while (!isWhiteSpace(this.him.innerHTML[aux2])) {
+			if (aux2 > this.him.innerHTML.length) {
+				aux2 = this.him.innerHTML.length;
+				break;
+			}
+			aux2 += 1;
+		}
+
+		// Put false cursor editor to get its position
+		this.him.innerHTML = this.him.innerHTML.substr(0, aux1) + '<nobr>' + this.him.innerHTML.substring(aux1, offset) + '<erase-me class="cursor"></erase-me>' + this.him.innerHTML.substring(offset, aux2) + '</nobr>' + this.him.innerHTML.substr(aux2);
+
+		// Measure stuff
+		let eraseMe = document.getElementsByTagName('erase-me')[0];
+		let offsetLeft = eraseMe.offsetLeft;
+		let offsetTop = eraseMe.offsetTop;
+		let height = eraseMe.clientHeight;
+
+		// Remove added stuff
+		this.him.innerHTML = this.him.innerHTML.replace('<erase-me class="cursor"></erase-me>', '');
+		this.him.innerHTML = this.him.innerHTML.replace(/<\/?nobr>/g, '');
+
+		// Put real cursor on editor
+		// -------------------------
+		this.him.innerHTML = `<cursor${this.id} class="cursor"></cursor${this.id}>` + this.him.innerHTML;
+		cursor = document.getElementsByTagName(`cursor${this.id}`)[0];
+		cursor.style.left = offsetLeft + 'px';
+		cursor.style.top = offsetTop + 'px';
+		cursor.style.height = height + 'px';
+	}
+
+	_equivalentOffsetOnHtml(offset, html) {
+		let state = {
+			offset: 0,
+			equivalent: 0,
+			tagOpened: false,
+			conflictingCharOpened: false
+		}
+
+		while (true) {
+			// Check end conditions
+			if (state.equivalent >= html.length) {
+				break;
+			}
+
+			if (state.offset === offset && state.tagOpened !== true && state.conflictingCharOpened !== true && html[state.equivalent] !== '<') {
+				break;
+			}
+
+			// Advance state
+			if (html[state.equivalent] === '<') {
+				state.tagOpened = true;
+				state.equivalent += 1;
+
+			} else if (html[state.equivalent] === '>') {
+				state.tagOpened = false;
+				state.equivalent += 1;
+
+			} else if (html[state.equivalent] === '&') {
+				state.conflictingCharOpened = true;
+				state.equivalent += 1;
+
+			} else if (state.conflictingCharOpened === true && html[state.equivalent] === ';') {
+				state.conflictingCharOpened = false;
+				state.equivalent += 1;
+				state.offset += 1;
+
+			} else if (state.tagOpened === true) {
+				state.equivalent += 1;
+
+			} else if (state.conflictingCharOpened === true) {
+				state.equivalent += 1;
+
 			} else {
-				clone.innerHTML += ' ' + word;
-			}
-
-			if (element.clientWidth < clone.clientWidth) {
-				// Find previos inserted ' ' and replace it with <br>
-				let i = clone.innerHTML.length;
-				while (i > 0) {
-					if (clone.innerHTML[i] === ' ') {
-						clone.innerHTML = clone.innerHTML.substr(0, i) + '<br>' + clone.innerHTML.substr(i + 1);
-						break;
-					}
-					i--;
-				}
+				state.offset += 1;
+				state.equivalent += 1;
 			}
 		}
 
-		element.innerHTML = clone.innerHTML;
-		this.him.removeChild(clone);
+		return state.equivalent;
 	}
 
-	/* Callbacks
-	   ========= */
+	// Callbacks
+	// =========
 
 	_onKeyboardInput(e) {
 		switch (e.value) {
 			case 'left-key':
-				this.cursor.moveLeft();
+				Parser.moveLeft(this.buffer, this.cursor);
 				break;
 
 			case 'right-key':
-				this.cursor.moveRight();
+				Parser.moveRight(this.buffer, this.cursor);
 				break;
 
 			case 'up-key':
-				this.cursor.moveUp();
 				break;
 
 			case 'down-key':
-				this.cursor.moveDown();
 				break;
 
 			case 'deletion':
-				this.cursor.deleteAtCursor();
+				Parser.delete(this.buffer, this.cursor);
 				break;
 
-			case 'new-line':
-				this.cursor.insertAtCursor('\n');
-				break;
-
-			default:
+			default: // Insertion
 				if (e.value.length === 1) {
-					this.cursor.insertAtCursor(e.value);
-					this.cursor.elementWithCursor.innerHTML = this.cursor.elementWithCursor.innerHTML.replace(/<br>/g, ' ');
-					this._wrapText(this.cursor.elementWithCursor);
+					Parser.insert(this.buffer, this.cursor, e.value);
 				}
 				break;
 		}
+
+		this._update();
 	}
 
 	_onClick(e) {
-		this.input.focus ();
+		this.input.focus();
 	}
 }
 
-// TO DO: Explain this
+// Generates an input box on the editor
 function Input(editor) {
 	let input = document.createElement('input');
 	input.setAttribute('type', 'text');
-	input.classList.add('crimson-editor-input');
+	input.classList.add('notebooks-editor-input');
 	editor.parentElement.appendChild (input);
 
+	// Listen for keypresses
 	document.addEventListener('keydown', function(e) {
 		if (input === document.activeElement) {
 			let aux = new CustomEvent('keyboard-input');
@@ -157,20 +235,21 @@ function Input(editor) {
 				input.dispatchEvent(aux);
 
 			} else if (e.keyCode == 13) {
-				aux.value = 'new-line';
+				aux.value = '\n';
 				input.dispatchEvent(aux);
-
 			}
 		}
 	});
 
+	// Listen for input
 	input.addEventListener('input', function (e) {
 			let aux = new CustomEvent('keyboard-input');
-			aux.type = 'input';
 			aux.value = input.value;
 
+			// Reset input box
 			input.value = '';
 
+			// Check for deleteContentBackward
 			if (e.inputType !== 'deleteContentBackward') {
 				input.dispatchEvent(aux);
 			}

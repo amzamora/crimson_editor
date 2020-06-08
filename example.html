@@ -2,17 +2,16 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<script src="src/js/cursor.js"></script>
 		<script src="src/js/parser.js"></script>
+		<script src="src/js/cursor.js"></script>
 		<script src="src/js/editor.js"></script>
+		<script src="src/js/buffer.js"></script>
 		<link rel="stylesheet" type="text/css" href="src/css/style.css" media="screen"/>
 		<link rel="stylesheet" type="text/css" href="src/css/elements.css" media="screen"/>
 		<style>
 
-		@import url('https://rsms.me/inter/inter.css');
-		html { font-family: 'Inter', sans-serif; }
-		@supports (font-variation-settings: bold) {
-		  html { font-family: 'Inter var', sans-serif; }
+		html {
+			font-family: 'Open Sans', sans-serif;
 		}
 
 		html, body {
@@ -27,7 +26,6 @@
 		#editor {
 			background-color: #fafafa;
 			padding-left: 15px;
-			padding-top: 10px;
 			max-width: 640px;
 			height: 400px;
 			margin: auto;
@@ -42,9 +40,9 @@
 		<pre id="editor">
 		</pre>
 		<script>
-			let editor = new TypoEditor('editor');
-			editor.setText("# Hello Editor\n\n## Hu\n\n\n\nContrary to popular belief,\n Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.");
-			//editor.setText("# Header 1\nHello, world!");
+			let editor = new NotebooksEditor('editor');
+			//editor.setText("# Hello editor!\nThis is a pragraph! And also is very very very very very very very very\n- very very\n- very long!\n\n- Yeah!\n- Yep\n- And yes");
+			editor.setText("# Header 1\nHello, world!");
 		</script>
 	</body>
 </html>
