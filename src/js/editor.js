@@ -14,9 +14,6 @@ class NotebooksEditor {
 		this.editor.addEventListener('click', function(e) {
 			self._onClick(e);
 		});
-		window.addEventListener('resize', function(e) {
-			self._update();
-		});
 	}
 
 	setText(text, cursor = -1) {
