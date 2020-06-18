@@ -17,7 +17,7 @@ class NotebooksEditor {
 	}
 
 	setText(text, cursor = -1) {
-		this.editor.innerHTML = Parser.parse(text);
+		this.editor.innerHTML = Parser.parse(text, cursor);
 	}
 
 	setFontSize(new_size) {

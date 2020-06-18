@@ -7,75 +7,12 @@ class Parser {
 		text = text.replace(/</g, '&lt;');
 		text = text.replace(/>/g, '&gt;');
 
-		// Format text
-		text = Parser.format(text);
-
 		let index = {pos: 0};
 		while (index.pos < text.length) {
 			output += this._next_element(text, index);
 		}
 
 		return output;
-	}
-
-	// This function is encharged to ensure that there is two new lines between block elements.
-	static format(text) {
-		let index = {
-			pos: 0
-		}
-		let formatted = '';
-
-		while (index.pos < text.length) {
-			// Header
-			if (this._isHeader(text, index.pos)) {
-				while (index.pos < text.length) {
-					if (text[index.pos] === '\n') {
-						break;
-					}
-					formatted += text[index.pos];
-					index.pos += 1;
-				}
-				if (index.pos < text.length) {
-					formatted += text[index.pos];
-					index.pos += 1;
-					if (text[index.pos] !== '\n') {
-						formatted += '\n';
-					}
-				}
-
-			// Paragraph | Blockquote | Lists
-			} else {
-				let list = false;
-				if (this._isList(text, index.pos)) {
-					list = true;
-				}
-
-				while (index.pos < text.length) {
-					if (text[index.pos] === '\n') {
-						if (this._isNewElement(text, index)) {
-							break;
-						}
-					}
-					if (text[index.pos] !== '\n') {
-						formatted += text[index.pos];
-					}
-					index.pos += 1;
-				}
-				if (index.pos < text.length) {
-					formatted += text[index.pos];
-					index.pos += 1;
-					if (text[index.pos] !== '\n' && !list) {
-						formatted += '\n';
-
-					} else if (text[index.pos] === '\n') {
-						formatted += text[index.pos];
-						index.pos += 1;
-					}
-				}
-			}
-		}
-
-		return formatted;
 	}
 
 	static _next_element(text, index) {
@@ -104,10 +41,10 @@ class Parser {
 			index.pos += 1;
 		}
 
-		// Move until new element
-		header += ' '; // Put ' ' instead of newlines
-		header += ' ';
-		index.pos += 2;
+		// Move until next element
+		while (text[index.pos] === '\n') {
+			index.pos += 1;
+		}
 
 		header += '</span>';
 
@@ -120,19 +57,23 @@ class Parser {
 		// Get content
 		while (index.pos < text.length) {
 			if (text[index.pos] === '\n') {
-				break;
+				if (this._isNewElement(text, index)) {
+					break;
+				}
+				paragraph += " ";
+				index.pos += 1;
 			}
 
 			paragraph += text[index.pos];
 			index.pos += 1;
 		}
 
-		// Move until new element
-		paragraph += ' '; // put ' ' instead of newlines
-		paragraph += ' ';
-		index.pos += 2;
-
 		paragraph += '</span>';
+
+		// Move until next element
+		while (text[index.pos] === '\n') {
+			index.pos += 1;
+		}
 
 		return paragraph;
 	}
@@ -141,34 +82,40 @@ class Parser {
 	static _getList(text, index) {
 		let list = '<ul>';
 
-		// Get sub items
+		// Get items
+		index.pos += 2;
+		let item = "";
 		while (index.pos < text.length) {
 			if (text[index.pos] === '\n') {
-				break;
-			}
-
-			// Get subItem
-			list += '<li><span style="display: none;">- </span>';
-			index.pos += 2;
-			while (index.pos < text.length) {
-				if (text[index.pos] === '\n') {
-					list += ' ';
-					break;
+				if (this._isNewElement(text, index)) {
+					list += "<li>" + item + "</li>";
+					if (this._isList(text, index.pos + 1)) {
+						index.pos += 3;
+						item = "";
+						continue;
+					}
+					else {
+						break;
+					}
 				}
-				list += text[index.pos];
+				item += " ";
 				index.pos += 1;
 			}
- 			list += '</li>';
+
+			// Get item
+			item += text[index.pos];
 
 			// Advance until new sub item
 			index.pos += 1;
 		}
 
-		// Move until new element
-		list = list.substr(0, list.length - 5) + ' ' + list.substr(list.length - 5); // put ' ' instead of newlines
-		index.pos += 1;
+		// Move until next element
+		while (text[index.pos] === '\n') {
+			index.pos += 1;
+		}
 
 		list += '</ul>';
+		console.log(list);
 
 		return list;
 	}
