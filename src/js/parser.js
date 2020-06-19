@@ -1,5 +1,5 @@
 class Parser {
-	static parse(text) {
+	static parse(text, cursor) {
 		let output = "";
 
 		// Replace conflicting characters
@@ -7,6 +7,13 @@ class Parser {
 		text = text.replace(/</g, '&lt;');
 		text = text.replace(/>/g, '&gt;');
 
+		// Put cursor
+		if (cursor === -1) {
+			cursor = text.length;
+		}
+	 	text = this._putCursor(text, cursor);
+
+		// Parse to html
 		let index = {pos: 0};
 		while (index.pos < text.length) {
 			output += this._next_element(text, index);
@@ -85,7 +92,12 @@ class Parser {
 		// Get items
 		index.pos += 2;
 		let item = "";
-		while (index.pos < text.length) {
+		while (true) {
+			if (index.pos >= text.length) {
+				list += "<li>" + item + "</li>";
+				break;
+			}
+
 			if (text[index.pos] === '\n') {
 				if (this._isNewElement(text, index)) {
 					list += "<li>" + item + "</li>";
@@ -115,7 +127,6 @@ class Parser {
 		}
 
 		list += '</ul>';
-		console.log(list);
 
 		return list;
 	}
@@ -166,8 +177,9 @@ class Parser {
 		return false;
 	}
 
-	static moveCursorLeft() {
-
+	static moveCursorLeft(editor) {
+		let cursor = document.getElementsByClassName("cursor")[0];
+		console.dir(cursor);
 	}
 
 	static moveCursorRight() {
@@ -180,5 +192,85 @@ class Parser {
 
 	static insert(str) {
 
+	}
+
+	static _equivalentOffsetOnHtml(offset, html) {
+		let state = {
+			offset: 0,
+			equivalent: 0,
+			tagOpened: false,
+			conflictingCharOpened: false
+		}
+
+		while (true) {
+			// Check end conditions
+			if (state.equivalent >= html.length) {
+				break;
+			}
+
+			if (state.offset === offset && state.tagOpened !== true && state.conflictingCharOpened !== true && html[state.equivalent] !== '<') {
+				break;
+			}
+
+			// Advance state
+			if (html[state.equivalent] === '<') {
+				state.tagOpened = true;
+				state.equivalent += 1;
+
+			} else if (html[state.equivalent] === '>') {
+				state.tagOpened = false;
+				state.equivalent += 1;
+
+			} else if (html[state.equivalent] === '&') {
+				state.conflictingCharOpened = true;
+				state.equivalent += 1;
+
+			} else if (state.conflictingCharOpened === true && html[state.equivalent] === ';') {
+				state.conflictingCharOpened = false;
+				state.equivalent += 1;
+				state.offset += 1;
+
+			} else if (state.tagOpened === true) {
+				state.equivalent += 1;
+
+			} else if (state.conflictingCharOpened === true) {
+				state.equivalent += 1;
+
+			} else {
+				state.offset += 1;
+				state.equivalent += 1;
+			}
+		}
+
+		return state.equivalent;
+	}
+
+	static _putCursor(text, cursor) {
+		function isWhiteSpace(char) {
+			return char === ' ' || char === '\n' || char === '<' || char === '>'
+		}
+
+		let offset = this._equivalentOffsetOnHtml(cursor, text);
+
+		let aux1 = offset - 1;
+		while (!isWhiteSpace(text[aux1])) {
+			if (aux1 < 1) {
+				aux1 = 0;
+				break;
+			}
+			aux1 -= 1;
+		}
+		if (aux1 !== 0) {aux1 += 1}
+
+		let aux2 = offset;
+		while (!isWhiteSpace(text[aux2]) && aux2 < text.length) {
+			if (aux2 > text.length) {
+				aux2 = text.ength;
+				break;
+			}
+			aux2 += 1;
+		}
+
+		return text.substr(0, aux1) + '<nobr>' + text.substring(aux1, offset) + '<cursor class="cursor"></cursor>' + text.substring(offset, aux2) + '</nobr>' + text.substr(aux2);
 	}
 }

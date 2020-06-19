@@ -30,7 +30,7 @@ class NotebooksEditor {
 	_onKeyboardInput(e) {
 		switch (e.value) {
 			case 'left-key':
-				Parser.moveLeft();
+				Parser.moveCursorLeft(this.editor);
 				break;
 
 			case 'right-key':
@@ -54,8 +54,6 @@ class NotebooksEditor {
 				}
 				break;
 		}
-
-		this._update();
 	}
 
 	_onClick(e) {
