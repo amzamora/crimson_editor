@@ -1,167 +1,27 @@
 class NotebooksEditor {
 	constructor (anchor) {
 		// Initialize editor
-		this.him = document.getElementById(anchor);
-		this.him.classList.add('NotebooksEditor');
-		this.him.innerHTML = '';
-		this.buffer = new Buffer();
+		this.editor = document.getElementById(anchor);
+		this.editor.classList.add('NotebooksEditor');
+		this.editor.innerHTML = '';
 
 		// Attach callbacks to manage input
-		this.input = Input(this.him);
+		this.input = Input(this.editor);
 		let self = this;
 		this.input.addEventListener('keyboard-input', function(e) {
 			self._onKeyboardInput(e);
 		});
-		this.him.addEventListener('click', function(e) {
+		this.editor.addEventListener('click', function(e) {
 			self._onClick(e);
-		});
-		window.addEventListener('resize', function(e) {
-			self._update();
 		});
 	}
 
 	setText(text, cursor = -1) {
-		text = Parser.format(text);
-		//console.log(text.replace(/\n/g, '\\n\n'));
-		this.buffer.setText(text);
-		if (cursor !== - 1) {
-			this.cursor = new Cursor(cursor, this.buffer);
-		} else {
-			this.cursor = new Cursor(text.length, this.buffer);
-		}
-
-		this._update(); // This is necessary
-		let self = this;
-		setTimeout(function() {
-			self._update(); // This is also necessary
-		}, 200);
+		this.editor.innerHTML = Parser.parse(text, cursor);
 	}
 
 	setFontSize(new_size) {
 
-	}
-
-	// Private
-	// =======
-
-	_update() {
-		// Get text
-		let text = this.buffer.getText();
-
-		// Replace conflicting characters
-		text = text.replace(/&/g, '&amp;');
-		text = text.replace(/</g, '&lt;');
-		text = text.replace(/>/g, '&gt;');
-
-		// Stylize
-		//console.log(Parser.stylize(text));
-		text = Parser.stylize(text);
-
-		// Put on editor
-		this.him.innerHTML = text;
-
-		// Draw cursor
-		this._drawCursor(this.cursor);
-	}
-
-	_drawCursor(cursor) {
-		// Find position of cursor
-		// -----------------------
-		let offset = this._equivalentOffsetOnHtml(cursor.offset, this.him.innerHTML);
-
-		// All this is to avoid breaking words where they shouldn't (FIX THIS)
-		function isWhiteSpace(char) {return char === ' ' || char === '\n' || char === '<' || char === '>'}
-
-		let aux1 = offset - 1;
-		while (!isWhiteSpace(this.him.innerHTML[aux1])) {
-			if (aux1 < 1) {
-				aux1 = 0;
-				break;
-			}
-			aux1 -= 1;
-		}
-		if (aux1 !== 0) {aux1 += 1}
-
-		let aux2 = offset;
-		while (!isWhiteSpace(this.him.innerHTML[aux2])) {
-			if (aux2 > this.him.innerHTML.length) {
-				aux2 = this.him.innerHTML.length;
-				break;
-			}
-			aux2 += 1;
-		}
-
-		// Put false cursor editor to get its position
-		this.him.innerHTML = this.him.innerHTML.substr(0, aux1) + '<nobr>' + this.him.innerHTML.substring(aux1, offset) + '<erase-me class="cursor"></erase-me>' + this.him.innerHTML.substring(offset, aux2) + '</nobr>' + this.him.innerHTML.substr(aux2);
-
-		// Measure stuff
-		let eraseMe = document.getElementsByTagName('erase-me')[0];
-		let offsetLeft = eraseMe.offsetLeft;
-		let offsetTop = eraseMe.offsetTop;
-		let height = eraseMe.clientHeight;
-
-		// Remove added stuff
-		this.him.innerHTML = this.him.innerHTML.replace('<erase-me class="cursor"></erase-me>', '');
-		this.him.innerHTML = this.him.innerHTML.replace(/<\/?nobr>/g, '');
-
-		// Put real cursor on editor
-		// -------------------------
-		this.him.innerHTML = `<cursor${this.id} class="cursor"></cursor${this.id}>` + this.him.innerHTML;
-		cursor = document.getElementsByTagName(`cursor${this.id}`)[0];
-		cursor.style.left = offsetLeft + 'px';
-		cursor.style.top = offsetTop + 'px';
-		cursor.style.height = height + 'px';
-	}
-
-	_equivalentOffsetOnHtml(offset, html) {
-		let state = {
-			offset: 0,
-			equivalent: 0,
-			tagOpened: false,
-			conflictingCharOpened: false
-		}
-
-		while (true) {
-			// Check end conditions
-			if (state.equivalent >= html.length) {
-				break;
-			}
-
-			if (state.offset === offset && state.tagOpened !== true && state.conflictingCharOpened !== true && html[state.equivalent] !== '<') {
-				break;
-			}
-
-			// Advance state
-			if (html[state.equivalent] === '<') {
-				state.tagOpened = true;
-				state.equivalent += 1;
-
-			} else if (html[state.equivalent] === '>') {
-				state.tagOpened = false;
-				state.equivalent += 1;
-
-			} else if (html[state.equivalent] === '&') {
-				state.conflictingCharOpened = true;
-				state.equivalent += 1;
-
-			} else if (state.conflictingCharOpened === true && html[state.equivalent] === ';') {
-				state.conflictingCharOpened = false;
-				state.equivalent += 1;
-				state.offset += 1;
-
-			} else if (state.tagOpened === true) {
-				state.equivalent += 1;
-
-			} else if (state.conflictingCharOpened === true) {
-				state.equivalent += 1;
-
-			} else {
-				state.offset += 1;
-				state.equivalent += 1;
-			}
-		}
-
-		return state.equivalent;
 	}
 
 	// Callbacks
@@ -170,11 +30,11 @@ class NotebooksEditor {
 	_onKeyboardInput(e) {
 		switch (e.value) {
 			case 'left-key':
-				Parser.moveLeft(this.buffer, this.cursor);
+				Parser.moveCursorLeft(this.editor);
 				break;
 
 			case 'right-key':
-				Parser.moveRight(this.buffer, this.cursor);
+				Parser.moveRight();
 				break;
 
 			case 'up-key':
@@ -184,17 +44,16 @@ class NotebooksEditor {
 				break;
 
 			case 'deletion':
-				Parser.delete(this.buffer, this.cursor);
+				Parser.delete();
 				break;
 
-			default: // Insertion
+			default:
+				// Insertion
 				if (e.value.length === 1) {
-					Parser.insert(this.buffer, this.cursor, e.value);
+					Parser.insert(e.value);
 				}
 				break;
 		}
-
-		this._update();
 	}
 
 	_onClick(e) {

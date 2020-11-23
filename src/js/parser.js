@@ -1,226 +1,28 @@
 class Parser {
-	/* Public
-	   ====== */
+	static parse(text, cursor) {
+		let output = "";
 
-	static stylize(text) {
-		let stylized = "";
-		let index = {
-			pos: 0
-		};
+		// Replace conflicting characters
+		text = text.replace(/&/g, '&amp;');
+		text = text.replace(/</g, '&lt;');
+		text = text.replace(/>/g, '&gt;');
+
+		// Put cursor
+		if (cursor === -1) {
+			cursor = text.length;
+		}
+	 	text = this._putCursor(text, cursor);
+
+		// Parse to html
+		let index = {pos: 0};
 		while (index.pos < text.length) {
-			stylized += this._nextElement(text, index);
+			output += this._next_element(text, index);
 		}
 
-		//stylized = this._inline_stylize(stylized);
-
-		return stylized;
+		return output;
 	}
 
-	// This function is encharged to ensure that there is two new lines between block elements.
-	static format(text) {
-		let index = {
-			pos: 0
-		}
-		let formatted = '';
-
-		while (index.pos < text.length) {
-			// Header
-			if (this._isHeader(text, index.pos)) {
-				while (index.pos < text.length) {
-					if (text[index.pos] === '\n') {
-						break;
-					}
-					formatted += text[index.pos];
-					index.pos += 1;
-				}
-				if (index.pos < text.length) {
-					formatted += text[index.pos];
-					index.pos += 1;
-					if (text[index.pos] !== '\n') {
-						formatted += '\n';
-					}
-				}
-
-			// Paragraph | Blockquote | Lists
-			} else {
-				let list = false;
-				if (this._isList(text, index.pos)) {
-					list = true;
-				}
-
-				while (index.pos < text.length) {
-					if (text[index.pos] === '\n') {
-						if (this._isNewElement(text, index)) {
-							break;
-						}
-					}
-					if (text[index.pos] !== '\n') {
-						formatted += text[index.pos];
-					}
-					index.pos += 1;
-				}
-				if (index.pos < text.length) {
-					formatted += text[index.pos];
-					index.pos += 1;
-					if (text[index.pos] !== '\n' && !list) {
-						formatted += '\n';
-
-					} else if (text[index.pos] === '\n') {
-						formatted += text[index.pos];
-						index.pos += 1;
-					}
-				}
-			}
-		}
-
-		return formatted;
-	}
-
-	static insert(buffer, cursor, char) {
-		if (char === '\n') {
-			let text = buffer.getText();
-
-			// Blockquote
-			if (this._isBlockquote(text, cursor.offset - 2)) {
-				buffer.insertAt(cursor.offset - 3, '\n\n');
-				cursor.moveRight(buffer);
-				cursor.moveRight(buffer);
-
-			// List
-			} else if (this._isList(text, cursor.offset - 2)) {
-				// Connected to a list by the top
-				if (this._isList(text, this._getElementStart(text, cursor.offset - 4))) {
-					buffer.insertAt(cursor.offset - 3, '\n');
-					cursor.moveRight(buffer);
-				} else {
-					buffer.insertAt(cursor.offset - 3, '\n\n');
-					cursor.moveRight(buffer);
-					cursor.moveRight(buffer);
-				}
-
-			// Middle of list
-		} else if (this._isList(text, this._getElementStart(text, cursor.offset - 1))) {
-				buffer.insertAt(cursor.offset, '\n- ');
-				cursor.moveRight(buffer);
-				cursor.moveRight(buffer);
-				cursor.moveRight(buffer);
-
-			// Else
-			} else {
-				buffer.insertAt(cursor.offset, '\n\n');
-				cursor.moveRight(buffer);
-				cursor.moveRight(buffer);
-
-				// If new element is created
-				let text = buffer.getText();
-
-				// Blockquote
-				if (this._isBlockquote(text, cursor.offset)) {
-					cursor.moveRight(buffer);
-					cursor.moveRight(buffer);
-				}
-			}
-		} else {
-			buffer.insertAt(cursor.offset, char);
-			cursor.moveRight(buffer);
-		}
-	}
-
-	static delete(buffer, cursor) {
-		if (cursor.offset > 0) {
-			let text = buffer.getText();
-			if (text[cursor.offset - 1] === '\n') {
-				buffer.deleteAt(cursor.offset - 2, 2);
-				cursor.moveLeft(buffer);
-				cursor.moveLeft(buffer);
-			} else {
-				if (this._isBlockquote(text, cursor.offset - 2)) {
-					buffer.deleteAt(cursor.offset - 2, 2);
-					cursor.moveLeft(buffer);
-					cursor.moveLeft(buffer);
-
-				} else if (this._isList(text, cursor.offset - 2)) {
-					buffer.deleteAt(cursor.offset - 2, 2);
-					cursor.moveLeft(buffer);
-					cursor.moveLeft(buffer);
-
-					// Connected to a list by the top
-					if (this._isList(text, this._getElementStart(text, cursor.offset - 2))) {
-						buffer.deleteAt(cursor.offset - 1, 1);
-						cursor.moveLeft(buffer);
-					}
-
-					// Connected to a list by the bottom
-					if (this._isList(text, this._getElementEnd(text, cursor.offset) + 2)) {
-						buffer.insertAt(this._getElementEnd(text, cursor.offset), "\n");
-					}
-
-				} else {
-					buffer.deleteAt(cursor.offset - 1, 1);
-					cursor.moveLeft(buffer);
-				}
-			}
-		}
-	}
-
-	static moveLeft(buffer, cursor) {
-		let text = buffer.getText();
-		if (text[cursor.offset - 1] === '\n') {
-			cursor.moveLeft(buffer);
-			cursor.moveLeft(buffer);
-		} else {
-			// Blockquote
-			if (this._isBlockquote(text, cursor.offset - 2)) {
-				cursor.moveLeft(buffer);
-				cursor.moveLeft(buffer);
-				cursor.moveLeft(buffer);
-				cursor.moveLeft(buffer);
-
-			// List
-			} else if (this._isList(text, cursor.offset - 2)) {
-				cursor.moveLeft(buffer);
-				cursor.moveLeft(buffer);
-				cursor.moveLeft(buffer);
-				if (text[cursor.offset - 1] === '\n') {
-					cursor.moveLeft(buffer);
-				}
-
-			// Paragraph
-			} else {
-				cursor.moveLeft(buffer);
-			}
-		}
-	}
-
-	static moveRight(buffer, cursor) {
-		let text = buffer.getText();
-		if (text[cursor.offset] === '\n') {
-			if (this._isList(text, cursor.offset + 1)) {
-				cursor.moveRight(buffer);
-			} else {
-				cursor.moveRight(buffer);
-				cursor.moveRight(buffer);
-			}
-
-			// Blockquote
-			if (this._isBlockquote(text, cursor.offset)) {
-				cursor.moveRight(buffer);
-				cursor.moveRight(buffer);
-			}
-
-			// List
-			if (this._isList(text, cursor.offset)) {
-				cursor.moveRight(buffer);
-				cursor.moveRight(buffer);
-			}
-		} else {
-			cursor.moveRight(buffer);
-		}
-	}
-
-	/* Private
-	   ======= */
-	static _nextElement(text, index) {
+	static _next_element(text, index) {
 		if (this._isHeader(text, index.pos)) {
 			return this._getHeader(text, index);
 
@@ -246,10 +48,10 @@ class Parser {
 			index.pos += 1;
 		}
 
-		// Move until new element
-		header += ' '; // Put ' ' instead of newlines
-		header += ' ';
-		index.pos += 2;
+		// Move until next element
+		while (text[index.pos] === '\n') {
+			index.pos += 1;
+		}
 
 		header += '</span>';
 
@@ -262,52 +64,67 @@ class Parser {
 		// Get content
 		while (index.pos < text.length) {
 			if (text[index.pos] === '\n') {
-				break;
+				if (this._isNewElement(text, index)) {
+					break;
+				}
+				paragraph += " ";
+				index.pos += 1;
 			}
 
 			paragraph += text[index.pos];
 			index.pos += 1;
 		}
 
-		// Move until new element
-		paragraph += ' '; // put ' ' instead of newlines
-		paragraph += ' ';
-		index.pos += 2;
-
 		paragraph += '</span>';
+
+		// Move until next element
+		while (text[index.pos] === '\n') {
+			index.pos += 1;
+		}
 
 		return paragraph;
 	}
 
+
 	static _getList(text, index) {
 		let list = '<ul>';
 
-		// Get sub items
-		while (index.pos < text.length) {
-			if (text[index.pos] === '\n') {
+		// Get items
+		index.pos += 2;
+		let item = "";
+		while (true) {
+			if (index.pos >= text.length) {
+				list += "<li>" + item + "</li>";
 				break;
 			}
 
-			// Get subItem
-			list += '<li><span style="display: none;">- </span>';
-			index.pos += 2;
-			while (index.pos < text.length) {
-				if (text[index.pos] === '\n') {
-					list += ' ';
-					break;
+			if (text[index.pos] === '\n') {
+				if (this._isNewElement(text, index)) {
+					list += "<li>" + item + "</li>";
+					if (this._isList(text, index.pos + 1)) {
+						index.pos += 3;
+						item = "";
+						continue;
+					}
+					else {
+						break;
+					}
 				}
-				list += text[index.pos];
+				item += " ";
 				index.pos += 1;
 			}
- 			list += '</li>';
+
+			// Get item
+			item += text[index.pos];
 
 			// Advance until new sub item
 			index.pos += 1;
 		}
 
-		// Move until new element
-		list = list.substr(0, list.length - 5) + ' ' + list.substr(list.length - 5); // put ' ' instead of newlines
-		index.pos += 1;
+		// Move until next element
+		while (text[index.pos] === '\n') {
+			index.pos += 1;
+		}
 
 		list += '</ul>';
 
@@ -360,41 +177,100 @@ class Parser {
 		return false;
 	}
 
-	// Return the starting index of the element at the cursor
-	static _getElementStart(text, index) {
-		if (index >= 0 && text[index] !== '\n') {
-			while (index > 0) {
-				if (text[index - 1] === '\n') {
-					break;
-				}
-				index -= 1;
-			}
-			return index;
+	static moveCursorLeft(editor) {
+		let cursor = document.getElementsByClassName("cursor")[0];
+		console.dir(cursor);
+	}
+
+	static moveCursorRight() {
+
+	}
+
+	static delete() {
+
+	}
+
+	static insert(str) {
+
+	}
+
+	static _equivalentOffsetOnHtml(offset, html) {
+		let state = {
+			offset: 0,
+			equivalent: 0,
+			tagOpened: false,
+			conflictingCharOpened: false
 		}
-		return -1;
-	}
 
-	static _getElementEnd(text, index) {
-		if (index <= text.length && text[index] !== '\n') {
-			while (true) {
-				if (text[index + 1] === '\n' || index + 1 === text.length) {
-					break;
-				}
-				index += 1;
+		while (true) {
+			// Check end conditions
+			if (state.equivalent >= html.length) {
+				break;
 			}
-			return index;
+
+			if (state.offset === offset && state.tagOpened !== true && state.conflictingCharOpened !== true && html[state.equivalent] !== '<') {
+				break;
+			}
+
+			// Advance state
+			if (html[state.equivalent] === '<') {
+				state.tagOpened = true;
+				state.equivalent += 1;
+
+			} else if (html[state.equivalent] === '>') {
+				state.tagOpened = false;
+				state.equivalent += 1;
+
+			} else if (html[state.equivalent] === '&') {
+				state.conflictingCharOpened = true;
+				state.equivalent += 1;
+
+			} else if (state.conflictingCharOpened === true && html[state.equivalent] === ';') {
+				state.conflictingCharOpened = false;
+				state.equivalent += 1;
+				state.offset += 1;
+
+			} else if (state.tagOpened === true) {
+				state.equivalent += 1;
+
+			} else if (state.conflictingCharOpened === true) {
+				state.equivalent += 1;
+
+			} else {
+				state.offset += 1;
+				state.equivalent += 1;
+			}
 		}
-		return -1;
+
+		return state.equivalent;
 	}
 
-	static _inline_stylize(stylized) {
-		// Bold text
-		let boldRegex = /\*[^\* \t\n](((?!\n\n)[^\*])*[^\* \t\n])?\*/gm;
-		/*stylized = stylized.replace(boldRegex, function(match) {
-			return '<span class="notation">*</span><span class=\"bold\">' + match.substring(1, match.length - 1) + '</span><span class="notation">*</span>';
-		});*/
+	static _putCursor(text, cursor) {
+		function isWhiteSpace(char) {
+			return char === ' ' || char === '\n' || char === '<' || char === '>'
+		}
 
-		return stylized;
+		let offset = this._equivalentOffsetOnHtml(cursor, text);
+
+		let aux1 = offset - 1;
+		while (!isWhiteSpace(text[aux1])) {
+			if (aux1 < 1) {
+				aux1 = 0;
+				break;
+			}
+			aux1 -= 1;
+		}
+		if (aux1 !== 0) {aux1 += 1}
+
+		let aux2 = offset;
+		while (!isWhiteSpace(text[aux2]) && aux2 < text.length) {
+			if (aux2 > text.length) {
+				aux2 = text.ength;
+				break;
+			}
+			aux2 += 1;
+		}
+
+		return text.substr(0, aux1) + '<nobr>' + text.substring(aux1, offset) + '<cursor class="cursor"></cursor>' + text.substring(offset, aux2) + '</nobr>' + text.substr(aux2);
 	}
-
 }
